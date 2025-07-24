@@ -12,3 +12,6 @@ boto3==1.39.10
 
 # Testing
 pytest==8.4.1
+
+# Development
+load_dotenv==0.1.0
