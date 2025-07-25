@@ -1,17 +1,7 @@
 # Core
 fastapi==0.116.1
 websockets==15.0.1
-
-# gRPC
-grpcio==1.73.1
-grpcio-tools==1.73.1
-protobuf==6.31.1
-
-# Cloud 
-boto3==1.39.10
+fp-orchestrator-utils==0.1.0
 
 # Testing
 pytest==8.4.1
-
-# Development
-load_dotenv==0.1.0

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package orchestrator_service;
+
+service OrchestratorService {
+  // HealthCheck is used to check the health of the orchestrator service.
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  
+  // OrchestratorStatus is used to send orchestrator status updates.
+  rpc OrchestratorStatus(OrchestratorStatusRequest) returns (OrchestratorStatusResponse);
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  bool status = 1;
+}
+
+message OrchestratorStatusRequest {}
+
+message OrchestratorStatusResponse {
+  bool is_ready = 1; // Indicates if the orchestrator is ready to process requests
+}
