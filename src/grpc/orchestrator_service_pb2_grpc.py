@@ -3,6 +3,7 @@
 import grpc
 import warnings
 
+import imu_service_pb2 as imu__service__pb2
 import orchestrator_service_pb2 as orchestrator__service__pb2
 
 GRPC_GENERATED_VERSION = '1.73.1'
@@ -44,6 +45,11 @@ class OrchestratorServiceStub(object):
                 request_serializer=orchestrator__service__pb2.OrchestratorStatusRequest.SerializeToString,
                 response_deserializer=orchestrator__service__pb2.OrchestratorStatusResponse.FromString,
                 _registered_method=True)
+        self.ReceiveIMUData = channel.unary_unary(
+                '/orchestrator_service.OrchestratorService/ReceiveIMUData',
+                request_serializer=imu__service__pb2.IMUPayload.SerializeToString,
+                response_deserializer=imu__service__pb2.IMUPayloadResponse.FromString,
+                _registered_method=True)
 
 
 class OrchestratorServiceServicer(object):
@@ -63,6 +69,13 @@ class OrchestratorServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ReceiveIMUData(self, request, context):
+        """Receive data from sensors.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_OrchestratorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -75,6 +88,11 @@ def add_OrchestratorServiceServicer_to_server(servicer, server):
                     servicer.OrchestratorStatus,
                     request_deserializer=orchestrator__service__pb2.OrchestratorStatusRequest.FromString,
                     response_serializer=orchestrator__service__pb2.OrchestratorStatusResponse.SerializeToString,
+            ),
+            'ReceiveIMUData': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReceiveIMUData,
+                    request_deserializer=imu__service__pb2.IMUPayload.FromString,
+                    response_serializer=imu__service__pb2.IMUPayloadResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -131,6 +149,33 @@ class OrchestratorService(object):
             '/orchestrator_service.OrchestratorService/OrchestratorStatus',
             orchestrator__service__pb2.OrchestratorStatusRequest.SerializeToString,
             orchestrator__service__pb2.OrchestratorStatusResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ReceiveIMUData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/orchestrator_service.OrchestratorService/ReceiveIMUData',
+            imu__service__pb2.IMUPayload.SerializeToString,
+            imu__service__pb2.IMUPayloadResponse.FromString,
             options,
             channel_credentials,
             insecure,

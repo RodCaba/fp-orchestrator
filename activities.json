@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Cooking",
+    "description": "Household is cooking together",
+    "created_at": "2025-07-26T10:08:10.355083"
+  },
+  {
+    "name": "Cleaning",
+    "description": "Household is cleaning the kitchen",
+    "created_at": "2025-07-26T10:08:10.355083"
+  },
+  {
+    "name": "Eating",
+    "description": "Household is eating together",
+    "created_at": "2025-07-26T10:08:10.355083"
+  },
+  {
+    "name": "Playing",
+    "description": "Household is playing a game together",
+    "created_at": "2025-07-26T10:08:10.355083"
+  },
+  {
+    "name": "Watching TV",
+    "description": "Household is watching TV together",
+    "created_at": "2025-07-26T10:08:10.355083"
+  },
+  {
+    "name": "Talking",
+    "description": "Household is just talking",
+    "created_at": "2025-07-26T10:08:10.355083"
+  }
+]

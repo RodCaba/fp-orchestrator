@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAR Orchestrator Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cog"></i> HAR System Orchestrator</h1>
+            <div class="status-indicator" id="orchestrator-status">
+                <span class="status-dot"></span>
+                <span class="status-text">Initializing...</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- System Status Section -->
+            <section class="status-section">
+                <h2><i class="fas fa-heartbeat"></i> System Status</h2>
+                <div class="sensors-grid">
+                    <div class="sensor-card" id="rfid-sensor">
+                        <div class="sensor-header">
+                            <i class="fas fa-wifi"></i>
+                            <h3>RFID Sensor</h3>
+                        </div>
+                        <div class="sensor-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Disconnected</span>
+                        </div>
+                        <div class="sensor-data">
+                            <p>Last Signal: <span id="rfid-last-signal">--</span></p>
+                        </div>
+                    </div>
+
+                    <div class="sensor-card" id="imu-sensor">
+                        <div class="sensor-header">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h3>IMU Sensor</h3>
+                        </div>
+                        <div class="sensor-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Disconnected</span>
+                        </div>
+                        <div class="sensor-data">
+                            <p>Batches Received: <span id="imu-batches">0</span></p>
+                        </div>
+                    </div>
+
+                    <div class="sensor-card" id="audio-sensor">
+                        <div class="sensor-header">
+                            <i class="fas fa-microphone"></i>
+                            <h3>Audio Sensor</h3>
+                        </div>
+                        <div class="sensor-status">
+                            <span class="status-dot"></span>
+                            <span class="status-text">Disconnected</span>
+                        </div>
+                        <div class="sensor-data">
+                            <p>Features Processed: <span id="audio-features">0</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="activity-section">
+                <h2><i class="fas fa-tags"></i> Activity Labeling</h2>
+                
+                <div class="activity-controls">
+                    <div class="current-activity">
+                        <h3>Current Activity</h3>
+                        <div class="activity-display" id="current-activity-display">
+                            <span class="activity-label" id="current-activity-label">No activity selected</span>
+                            <button class="btn btn-danger" id="stop-activity-btn" style="display: none;">
+                                <i class="fas fa-stop"></i> Stop Recording
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="activity-selection">
+                        <h3>Select Activity</h3>
+                        <div class="selection-controls">
+                            <select id="activity-selector" class="form-control">
+                                <option value="">Choose an activity...</option>
+                            </select>
+                            <button class="btn btn-primary" id="start-activity-btn" disabled>
+                                <i class="fas fa-play"></i> Start Recording
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="add-activity">
+                        <h3>Add New Activity</h3>
+                        <div class="add-controls">
+                            <input type="text" id="new-activity-input" class="form-control" placeholder="Enter new activity name...">
+                            <input type="text" id="new-activity-description" class="form-control" placeholder="Enter activity description (optional)">
+                            <button class="btn btn-success" id="add-activity-btn">
+                                <i class="fas fa-plus"></i> Add Activity
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats-section">
+                <h2><i class="fas fa-chart-bar"></i> Data Collection Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-batches">0</div>
+                        <div class="stat-label">Total Batches Processed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-session-time">00:00:00</div>
+                        <div class="stat-label">Current Session Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="s3-uploads">0</div>
+                        <div class="stat-label">Uploaded to S3</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="error-count">0</div>
+                        <div class="stat-label">Errors</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
