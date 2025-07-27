@@ -163,7 +163,6 @@ class Buffer:
                 'n_users': n_users,
                 'data': [item.model_dump() for item in failed_data],
                 'error': str(error),
-                'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
             }
             with open(os.path.join('backup', backup_file), 'w') as f:
                 json.dump(backup_data, f)

@@ -9,6 +9,5 @@ class SensorData(BaseModel):
     """
     sensor_type: str
     device_id: Optional[str] = None
-    timestamp: datetime
     data: Dict[str, Any]
     batch_id: Optional[str] = None

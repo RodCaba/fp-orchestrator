@@ -212,7 +212,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         return SensorData(
             device_id=request.device_id,
             sensor_type=request.data.sensor_type,
-            timestamp=datetime.now(),
             data=sensor_values,
             batch_id=f"batch_{int(time.time() * 1000)}"
         )
@@ -224,7 +223,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         return SensorData(
             device_id=request.session_id,
             sensor_type="audio",
-            timestamp=datetime.now(),
             data={
                 "channels": request.channels,
                 "sample_rate": request.sample_rate,
