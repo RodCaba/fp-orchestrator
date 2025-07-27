@@ -76,7 +76,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         try:
             if not self.system_status.orchestrator_ready or self.current_users == 0:
                 logger.warning("Orchestrator is not ready to receive IMU data")
-                return orchestrator_service_pb2.IMUPayloadResponse(
+                return imu_service_pb2.IMUPayloadResponse(
                     device_id=request.device_id,
                     status="rejected_not_ready"
                 )
