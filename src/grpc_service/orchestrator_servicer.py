@@ -6,6 +6,7 @@ import sys
 import grpc
 from ..models import SensorData
 from ..websocket_manager import WebSocketManager
+from ..buffer import Buffer
 from datetime import datetime
 import time
 import threading
@@ -40,7 +41,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             "audio": { "features_processed": 0 },
             "rfid": { "last_signal": None }
         }
-        self.imu_buffer = []
+        self.buffer = Buffer(size=10000)
         self.wsocket_manager = wsocket_manager   
         self.current_users = 0
 
@@ -88,6 +89,9 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             # Update stats
             self.sensor_stats["imu"]["batches_received"] += 1
             self.system_status.total_batches_processed += 1
+
+            # Add to buffer
+            self._handle_buffer_upload(imu_data)
             
             # Update sensor status
             self._handle_imu_websocket_updates()
@@ -153,6 +157,10 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             
             # Broadcast audio data via WebSocket
             self._handle_audio_websocket_updates()
+            audio_data = self._proto_to_sensor_audio_data(request)
+
+            # Add to buffer
+            self._handle_buffer_upload(audio_data)
 
             return audio_service_pb2.AudioPayloadResponse(
                 session_id=request.session_id,
@@ -166,6 +174,19 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             return audio_service_pb2.AudioPayloadResponse(
                 session_id=request.session_id,
                 status="error"
+            )
+        
+    def _handle_buffer_upload(self, data: SensorData):
+        """
+        Handles data upload to the buffer.
+        """
+        self.buffer.add(data)
+
+        if self.buffer.current_size() >= self.buffer.size:
+            logger.info(f"Buffer size exceeded threshold, uploading {self.buffer.current_size()} items to S3")
+            self.buffer.upload_to_s3_async(
+                label=self.system_status.current_activity.name,
+                n_users=self.current_users
             )
 
     def _proto_to_sensor_imu_data(self, request):
@@ -195,6 +216,23 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             sensor_type=request.data.sensor_type,
             timestamp=datetime.now(),
             data=sensor_values,
+            batch_id=f"batch_{int(time.time() * 1000)}"
+        )
+
+    def _proto_to_sensor_audio_data(self, request):
+        """
+        Converts a protobuf audio payload to a SensorData object.
+        """
+        return SensorData(
+            device_id=request.session_id,
+            sensor_type="audio",
+            timestamp=datetime.now(),
+            data={
+                "channels": request.channels,
+                "sample_rate": request.sample_rate,
+                "features": request.features,
+                "parameters": request.parameters,
+            },
             batch_id=f"batch_{int(time.time() * 1000)}"
         )
     

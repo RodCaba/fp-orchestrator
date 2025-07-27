@@ -10,6 +10,12 @@ class HARDashboard {
             s3Uploads: 0,
             errorCount: 0
         };
+        this.s3Stats = {
+            totalUploads: 0,
+            totalErrors: 0,
+            pendingUploads: 0,
+            lastUploadTime: null
+        };
         
         this.init();
     }
@@ -66,6 +72,8 @@ class HARDashboard {
             case 'stats_update':
                 this.updateStats(data.stats);
                 break;
+            case 's3_stats':
+                this.updateS3Stats(data.stats);
             case 'orchestrator_status':
                 this.updateOrchestratorStatus(data.status, data.message);
                 break;
@@ -247,8 +255,12 @@ class HARDashboard {
         Object.assign(this.stats, stats);
         
         document.getElementById('total-batches').textContent = this.stats.totalBatches;
-        document.getElementById('s3-uploads').textContent = this.stats.s3Uploads;
-        document.getElementById('error-count').textContent = this.stats.errorCount;
+    }
+
+    updateS3Stats(stats) {
+        Object.assign(this.s3Stats, stats);
+        document.getElementById('s3-uploads').textContent = this.s3Stats.totalUploads;
+        document.getElementById('error-count').textContent = this.s3Stats.totalErrors;
     }
 
     // Event Listeners
