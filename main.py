@@ -79,6 +79,7 @@ async def start_activity(request: StartActivityRequest):
     try:
         activity = activity_manager.get_by_name(request.activity_name)
         # Update system status
+        orchestrator_servicer.system_status.orchestrator_ready = True
         orchestrator_servicer.system_status.current_activity = activity
         orchestrator_servicer.system_status.session_start_time = datetime.now()
 
