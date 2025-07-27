@@ -14,4 +14,4 @@ fp-orchestrator-utils==0.3.0
 # gRPC
 grpcio==1.73.1
 grpcio-tools==1.73.1
-protobuf==4.25.5
+protobuf==6.31.1
