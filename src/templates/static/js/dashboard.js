@@ -72,7 +72,7 @@ class HARDashboard {
             case 'stats_update':
                 this.updateStats(data.stats);
                 break;
-            case 's3_stats':
+            case 's3_stats_update':
                 this.updateS3Stats(data.stats);
             case 'orchestrator_status':
                 this.updateOrchestratorStatus(data.status, data.message);

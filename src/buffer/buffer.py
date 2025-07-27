@@ -179,7 +179,7 @@ class Buffer:
                 asyncio.set_event_loop(loop)
 
                 loop.run_until_complete(
-                    self.wsocket_manager.broadcast_stats_update(self.upload_stats)
+                    self.wsocket_manager.broadcast_s3_stats_update(self.upload_stats)
                 )
             except Exception as e:
                 logger.error(f"Error broadcasting IMU data: {e}")
