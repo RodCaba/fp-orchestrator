@@ -8,6 +8,7 @@ from ..models import SensorData
 from ..websocket_manager import WebSocketManager
 from datetime import datetime
 import time
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -86,19 +87,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             self.system_status.total_batches_processed += 1
             
             # Update sensor status
-            try:
-                loop = asyncio.get_event_loop()
-                
-                loop.create_task(
-                    self.wsocket_manager.broadcast_sensor_status("imu", "connected", self.sensor_stats["imu"])
-                )
-
-                # Update stats
-                loop.create_task(
-                    self.wsocket_manager.broadcast_stats_update(self.sensor_stats)
-                )
-            except Exception as e:
-                logger.error(f"Error broadcasting sensor status: {e}")
+            self._handle_imu_websocket_updates()
 
             return imu_service_pb2.IMUPayloadResponse(
                 device_id=request.device_id,
@@ -143,3 +132,26 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             data=sensor_values,
             batch_id=f"batch_{int(time.time() * 1000)}"
         )
+    
+    def _handle_imu_websocket_updates(self):
+        """
+        Handles WebSocket updates for IMU data.
+        """
+        def run_async_updates():
+            try:
+                loop = asyncio.get_event_loop()
+                asyncio.set_event_loop(loop)
+
+                loop.run_until_complete(
+                    self.wsocket_manager.broadcast_sensor_status("imu", "connected", self.sensor_stats["imu"])
+                )
+                loop.run_until_complete(
+                    self.wsocket_manager.broadcast_stats_update(self.sensor_stats)
+                )
+            except Exception as e:
+                logger.error(f"Error broadcasting IMU data: {e}")
+
+            finally:
+                loop.close()
+        thread = threading.Thread(target=run_async_updates, daemon=True)
+        thread.start()
