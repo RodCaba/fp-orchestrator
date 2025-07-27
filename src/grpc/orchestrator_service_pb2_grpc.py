@@ -3,6 +3,7 @@
 import grpc
 import warnings
 
+import audio_service_pb2 as audio__service__pb2
 import imu_service_pb2 as imu__service__pb2
 import orchestrator_service_pb2 as orchestrator__service__pb2
 import rfid_service_pb2 as rfid__service__pb2
@@ -56,6 +57,11 @@ class OrchestratorServiceStub(object):
                 request_serializer=rfid__service__pb2.RFIDPayload.SerializeToString,
                 response_deserializer=rfid__service__pb2.RFIDPayloadResponse.FromString,
                 _registered_method=True)
+        self.ReceiveAudioData = channel.unary_unary(
+                '/orchestrator_service.OrchestratorService/ReceiveAudioData',
+                request_serializer=audio__service__pb2.AudioPayload.SerializeToString,
+                response_deserializer=audio__service__pb2.AudioPayloadResponse.FromString,
+                _registered_method=True)
 
 
 class OrchestratorServiceServicer(object):
@@ -89,6 +95,13 @@ class OrchestratorServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ReceiveAudioData(self, request, context):
+        """Receive audio data from audio service
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_OrchestratorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -111,6 +124,11 @@ def add_OrchestratorServiceServicer_to_server(servicer, server):
                     servicer.ReceiveRFIDData,
                     request_deserializer=rfid__service__pb2.RFIDPayload.FromString,
                     response_serializer=rfid__service__pb2.RFIDPayloadResponse.SerializeToString,
+            ),
+            'ReceiveAudioData': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReceiveAudioData,
+                    request_deserializer=audio__service__pb2.AudioPayload.FromString,
+                    response_serializer=audio__service__pb2.AudioPayloadResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -221,6 +239,33 @@ class OrchestratorService(object):
             '/orchestrator_service.OrchestratorService/ReceiveRFIDData',
             rfid__service__pb2.RFIDPayload.SerializeToString,
             rfid__service__pb2.RFIDPayloadResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ReceiveAudioData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/orchestrator_service.OrchestratorService/ReceiveAudioData',
+            audio__service__pb2.AudioPayload.SerializeToString,
+            audio__service__pb2.AudioPayloadResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -1,5 +1,6 @@
 import imu_service_pb2 as _imu_service_pb2
 import rfid_service_pb2 as _rfid_service_pb2
+import audio_service_pb2 as _audio_service_pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Optional as _Optional

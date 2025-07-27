@@ -24,23 +24,24 @@ _sym_db = _symbol_database.Default()
 
 import imu_service_pb2 as imu__service__pb2
 import rfid_service_pb2 as rfid__service__pb2
+import audio_service_pb2 as audio__service__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1aorchestrator_service.proto\x12\x14orchestrator_service\x1a\x11imu_service.proto\x1a\x12rfid_service.proto\"\x14\n\x12HealthCheckRequest\"%\n\x13HealthCheckResponse\x12\x0e\n\x06status\x18\x01 \x01(\x08\"\x1b\n\x19OrchestratorStatusRequest\"H\n\x1aOrchestratorStatusResponse\x12\x10\n\x08is_ready\x18\x01 \x01(\x08\x12\x18\n\x10\x63urrent_activity\x18\x02 \x01(\t2\x8f\x03\n\x13OrchestratorService\x12\x62\n\x0bHealthCheck\x12(.orchestrator_service.HealthCheckRequest\x1a).orchestrator_service.HealthCheckResponse\x12w\n\x12OrchestratorStatus\x12/.orchestrator_service.OrchestratorStatusRequest\x1a\x30.orchestrator_service.OrchestratorStatusResponse\x12J\n\x0eReceiveIMUData\x12\x17.imu_service.IMUPayload\x1a\x1f.imu_service.IMUPayloadResponse\x12O\n\x0fReceiveRFIDData\x12\x19.rfid_service.RFIDPayload\x1a!.rfid_service.RFIDPayloadResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1aorchestrator_service.proto\x12\x14orchestrator_service\x1a\x11imu_service.proto\x1a\x12rfid_service.proto\x1a\x13\x61udio_service.proto\"\x14\n\x12HealthCheckRequest\"%\n\x13HealthCheckResponse\x12\x0e\n\x06status\x18\x01 \x01(\x08\"\x1b\n\x19OrchestratorStatusRequest\"H\n\x1aOrchestratorStatusResponse\x12\x10\n\x08is_ready\x18\x01 \x01(\x08\x12\x18\n\x10\x63urrent_activity\x18\x02 \x01(\t2\xe5\x03\n\x13OrchestratorService\x12\x62\n\x0bHealthCheck\x12(.orchestrator_service.HealthCheckRequest\x1a).orchestrator_service.HealthCheckResponse\x12w\n\x12OrchestratorStatus\x12/.orchestrator_service.OrchestratorStatusRequest\x1a\x30.orchestrator_service.OrchestratorStatusResponse\x12J\n\x0eReceiveIMUData\x12\x17.imu_service.IMUPayload\x1a\x1f.imu_service.IMUPayloadResponse\x12O\n\x0fReceiveRFIDData\x12\x19.rfid_service.RFIDPayload\x1a!.rfid_service.RFIDPayloadResponse\x12T\n\x10ReceiveAudioData\x12\x1b.audio_service.AudioPayload\x1a#.audio_service.AudioPayloadResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'orchestrator_service_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_HEALTHCHECKREQUEST']._serialized_start=91
-  _globals['_HEALTHCHECKREQUEST']._serialized_end=111
-  _globals['_HEALTHCHECKRESPONSE']._serialized_start=113
-  _globals['_HEALTHCHECKRESPONSE']._serialized_end=150
-  _globals['_ORCHESTRATORSTATUSREQUEST']._serialized_start=152
-  _globals['_ORCHESTRATORSTATUSREQUEST']._serialized_end=179
-  _globals['_ORCHESTRATORSTATUSRESPONSE']._serialized_start=181
-  _globals['_ORCHESTRATORSTATUSRESPONSE']._serialized_end=253
-  _globals['_ORCHESTRATORSERVICE']._serialized_start=256
-  _globals['_ORCHESTRATORSERVICE']._serialized_end=655
+  _globals['_HEALTHCHECKREQUEST']._serialized_start=112
+  _globals['_HEALTHCHECKREQUEST']._serialized_end=132
+  _globals['_HEALTHCHECKRESPONSE']._serialized_start=134
+  _globals['_HEALTHCHECKRESPONSE']._serialized_end=171
+  _globals['_ORCHESTRATORSTATUSREQUEST']._serialized_start=173
+  _globals['_ORCHESTRATORSTATUSREQUEST']._serialized_end=200
+  _globals['_ORCHESTRATORSTATUSRESPONSE']._serialized_start=202
+  _globals['_ORCHESTRATORSTATUSRESPONSE']._serialized_end=274
+  _globals['_ORCHESTRATORSERVICE']._serialized_start=277
+  _globals['_ORCHESTRATORSERVICE']._serialized_end=762
 # @@protoc_insertion_point(module_scope)

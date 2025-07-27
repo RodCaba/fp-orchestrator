@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x61udio_service.proto\x12\raudio_service\"\xf6\x01\n\x0c\x41udioPayload\x12\x12\n\nsession_id\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x03\x12\x1a\n\x12original_file_path\x18\x03 \x01(\t\x12\x14\n\x0c\x61udio_format\x18\x04 \x01(\t\x12\x13\n\x0bsample_rate\x18\x05 \x01(\x05\x12\x10\n\x08\x63hannels\x18\x06 \x01(\x05\x12-\n\x08\x66\x65\x61tures\x18\x07 \x03(\x0b\x32\x1b.audio_service.AudioFeature\x12\x37\n\nparameters\x18\x08 \x01(\x0b\x32#.audio_service.ProcessingParameters\"y\n\x0c\x41udioFeature\x12\x14\n\x0c\x66\x65\x61ture_type\x18\x01 \x01(\t\x12\x15\n\rfeature_shape\x18\x02 \x03(\x05\x12<\n\x12\x66\x65\x61ture_parameters\x18\x03 \x01(\x0b\x32 .audio_service.FeatureParameters\"d\n\x11\x46\x65\x61tureParameters\x12\r\n\x05n_ftt\x18\x01 \x01(\x05\x12\x12\n\nhop_length\x18\x02 \x01(\x05\x12\x0e\n\x06n_mels\x18\x03 \x01(\x05\x12\r\n\x05\x66_min\x18\x04 \x01(\x05\x12\r\n\x05\x66_max\x18\x05 \x01(\x05\"\\\n\x14ProcessingParameters\x12\x1a\n\x12target_sample_rate\x18\x01 \x01(\x05\x12\x15\n\rtarget_length\x18\x02 \x01(\x05\x12\x11\n\tnormalize\x18\x03 \x01(\x08\"M\n\x14\x41udioPayloadResponse\x12\x12\n\nsession_id\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x03\x12\x0e\n\x06status\x18\x03 \x01(\t\"\x14\n\x12HealthCheckRequest\"6\n\x13HealthCheckResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t2\xbd\x01\n\x0c\x41udioService\x12T\n\x0bHealthCheck\x12!.audio_service.HealthCheckRequest\x1a\".audio_service.HealthCheckResponse\x12W\n\x13ProcessAudioPayload\x12\x1b.audio_service.AudioPayload\x1a#.audio_service.AudioPayloadResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x13\x61udio_service.proto\x12\raudio_service\"\xb1\x01\n\x0c\x41udioPayload\x12\x12\n\nsession_id\x18\x01 \x01(\t\x12\x13\n\x0bsample_rate\x18\x02 \x01(\x05\x12\x10\n\x08\x63hannels\x18\x03 \x01(\x05\x12-\n\x08\x66\x65\x61tures\x18\x04 \x01(\x0b\x32\x1b.audio_service.AudioFeature\x12\x37\n\nparameters\x18\x05 \x01(\x0b\x32#.audio_service.ProcessingParameters\"\xa2\x01\n\x0c\x41udioFeature\x12\x14\n\x0c\x66\x65\x61ture_type\x18\x01 \x01(\t\x12\x15\n\rfeature_shape\x18\x02 \x03(\x05\x12\x14\n\x0c\x66\x65\x61ture_data\x18\x03 \x01(\x0c\x12<\n\x12\x66\x65\x61ture_parameters\x18\x04 \x01(\x0b\x32 .audio_service.FeatureParameters\x12\x11\n\tdata_type\x18\x05 \x01(\t\"\x8f\x01\n\x11\x46\x65\x61tureParameters\x12\r\n\x05n_fft\x18\x01 \x01(\x05\x12\x12\n\nhop_length\x18\x02 \x01(\x05\x12\x0e\n\x06n_mels\x18\x03 \x01(\x05\x12\r\n\x05\x66_min\x18\x04 \x01(\x05\x12\r\n\x05\x66_max\x18\x05 \x01(\x05\x12\x1a\n\x12target_sample_rate\x18\x06 \x01(\x05\x12\r\n\x05power\x18\x07 \x01(\x02\"\x91\x01\n\x14ProcessingParameters\x12\x1a\n\x12target_sample_rate\x18\x01 \x01(\x05\x12\x15\n\rtarget_length\x18\x02 \x01(\x05\x12\x11\n\tnormalize\x18\x03 \x01(\x08\x12\x1c\n\x14normalization_method\x18\x04 \x01(\t\x12\x15\n\rtrim_strategy\x18\x05 \x01(\t\"K\n\x14\x41udioPayloadResponse\x12\x12\n\nsession_id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\x12\x0f\n\x07message\x18\x03 \x01(\t\"\x14\n\x12HealthCheckRequest\"6\n\x13HealthCheckResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t2\xbd\x01\n\x0c\x41udioService\x12T\n\x0bHealthCheck\x12!.audio_service.HealthCheckRequest\x1a\".audio_service.HealthCheckResponse\x12W\n\x13ProcessAudioPayload\x12\x1b.audio_service.AudioPayload\x1a#.audio_service.AudioPayloadResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,19 +32,19 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'audio_service_pb2', _global
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_AUDIOPAYLOAD']._serialized_start=39
-  _globals['_AUDIOPAYLOAD']._serialized_end=285
-  _globals['_AUDIOFEATURE']._serialized_start=287
-  _globals['_AUDIOFEATURE']._serialized_end=408
-  _globals['_FEATUREPARAMETERS']._serialized_start=410
-  _globals['_FEATUREPARAMETERS']._serialized_end=510
-  _globals['_PROCESSINGPARAMETERS']._serialized_start=512
-  _globals['_PROCESSINGPARAMETERS']._serialized_end=604
-  _globals['_AUDIOPAYLOADRESPONSE']._serialized_start=606
-  _globals['_AUDIOPAYLOADRESPONSE']._serialized_end=683
-  _globals['_HEALTHCHECKREQUEST']._serialized_start=685
-  _globals['_HEALTHCHECKREQUEST']._serialized_end=705
-  _globals['_HEALTHCHECKRESPONSE']._serialized_start=707
-  _globals['_HEALTHCHECKRESPONSE']._serialized_end=761
-  _globals['_AUDIOSERVICE']._serialized_start=764
-  _globals['_AUDIOSERVICE']._serialized_end=953
+  _globals['_AUDIOPAYLOAD']._serialized_end=216
+  _globals['_AUDIOFEATURE']._serialized_start=219
+  _globals['_AUDIOFEATURE']._serialized_end=381
+  _globals['_FEATUREPARAMETERS']._serialized_start=384
+  _globals['_FEATUREPARAMETERS']._serialized_end=527
+  _globals['_PROCESSINGPARAMETERS']._serialized_start=530
+  _globals['_PROCESSINGPARAMETERS']._serialized_end=675
+  _globals['_AUDIOPAYLOADRESPONSE']._serialized_start=677
+  _globals['_AUDIOPAYLOADRESPONSE']._serialized_end=752
+  _globals['_HEALTHCHECKREQUEST']._serialized_start=754
+  _globals['_HEALTHCHECKREQUEST']._serialized_end=774
+  _globals['_HEALTHCHECKRESPONSE']._serialized_start=776
+  _globals['_HEALTHCHECKRESPONSE']._serialized_end=830
+  _globals['_AUDIOSERVICE']._serialized_start=833
+  _globals['_AUDIOSERVICE']._serialized_end=1022
 # @@protoc_insertion_point(module_scope)

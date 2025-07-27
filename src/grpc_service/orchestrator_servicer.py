@@ -144,7 +144,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             if not self.system_status.orchestrator_ready or self.current_users == 0:
                 logger.warning("Orchestrator is not ready to receive audio data")
                 return audio_service_pb2.AudioPayloadResponse(
-                    device_id=request.device_id,
+                    session_id=request.session_id,
                     status="rejected_not_ready"
                 )
             # Process the audio data
@@ -155,7 +155,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             self.wsocket_manager.broadcast_sensor_status("audio", "connected", {})
 
             return audio_service_pb2.AudioPayloadResponse(
-                device_id=request.device_id,
+                session_id=request.session_id,
                 status="success"
             )
 
@@ -164,7 +164,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details("Internal server error")
             return audio_service_pb2.AudioPayloadResponse(
-                device_id=request.device_id,
+                session_id=request.session_id,
                 status="error"
             )
 
