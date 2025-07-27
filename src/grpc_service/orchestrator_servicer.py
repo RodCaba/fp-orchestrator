@@ -241,7 +241,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             "feature_shape": request.features.feature_shape,
             "feature_data": request.features.feature_data,
             "feature_parameters": {
-                "n_ftt": request.features.feature_parameters.parameters.n_ftt,
+                "n_fft": request.features.feature_parameters.parameters.n_fft,
                 "hop_length": request.features.feature_parameters.parameters.hop_length,
                 "n_mels": request.features.feature_parameters.parameters.n_mels,
                 "f_min": request.features.feature_parameters.parameters.f_min,
