@@ -49,7 +49,19 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         Returns the current status of the orchestrator.
         """
         logger.info("Orchestrator status request received")
-        return orchestrator_service_pb2.OrchestratorStatusResponse(is_ready=self.system_status.orchestrator_ready)
+
+        current_activity_name = ""
+
+        if self.system_status.current_activity:
+            current_activity_name = self.system_status.current_activity.name
+
+        response = orchestrator_service_pb2.OrchestratorStatusResponse(
+            is_ready=self.system_status.orchestrator_ready,
+            current_activity=current_activity_name
+        )
+
+        logger.info(f"Orchestrator status: {response.is_ready}, Current activity: {response.current_activity}")
+        return response
 
     async def ReceiveIMUData(self, request, context):
         """
