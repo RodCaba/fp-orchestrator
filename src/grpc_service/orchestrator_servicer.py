@@ -241,13 +241,13 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             "feature_shape": request.features.feature_shape,
             "feature_data": request.features.feature_data,
             "feature_parameters": {
-                "n_fft": request.features.feature_parameters.parameters.n_fft,
-                "hop_length": request.features.feature_parameters.parameters.hop_length,
-                "n_mels": request.features.feature_parameters.parameters.n_mels,
-                "f_min": request.features.feature_parameters.parameters.f_min,
-                "f_max": request.features.feature_parameters.parameters.f_max,
-                "target_sample_rate": request.features.feature_parameters.parameters.target_sample_rate,
-                "power": request.features.feature_parameters.parameters.power
+                "n_fft": request.features.feature_parameters.n_fft,
+                "hop_length": request.features.feature_parameters.hop_length,
+                "n_mels": request.features.feature_parameters.n_mels,
+                "f_min": request.features.feature_parameters.f_min,
+                "f_max": request.features.feature_parameters.f_max,
+                "target_sample_rate": request.features.feature_parameters.target_sample_rate,
+                "power": request.features.feature_parameters.power
             }
         }
 
