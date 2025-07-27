@@ -58,7 +58,7 @@ class HARDashboard {
     handleWebSocketMessage(data) {
         switch (data.type) {
             case 'sensor_status':
-                this.updateSensorStatus(data.sensor, data.status, data.data);
+                this.updateSensorStatus(data.sensor_type, data.status, data.data);
                 break;
             case 'activity_update':
                 this.handleActivityUpdate(data);
