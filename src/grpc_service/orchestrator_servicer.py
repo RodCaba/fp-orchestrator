@@ -152,7 +152,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             self.system_status.total_batches_processed += 1
             
             # Broadcast audio data via WebSocket
-            self.wsocket_manager.broadcast_sensor_status("audio", "connected", {})
+            self._handle_audio_websocket_updates()
 
             return audio_service_pb2.AudioPayloadResponse(
                 session_id=request.session_id,
@@ -241,6 +241,28 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 )
             except Exception as e:
                 logger.error(f"Error broadcasting RFID data: {e}")
+
+            finally:
+                if loop:
+                    loop.close()
+        thread = threading.Thread(target=run_async_updates, daemon=True)
+        thread.start()
+
+    def _handle_audio_websocket_updates(self):
+        """
+        Handles WebSocket updates for audio data.
+        """
+        def run_async_updates():
+            loop = None
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+
+                loop.run_until_complete(
+                    self.wsocket_manager.broadcast_sensor_status("audio", "connected", self.sensor_stats["audio"])
+                )
+            except Exception as e:
+                logger.error(f"Error broadcasting audio data: {e}")
 
             finally:
                 if loop:
