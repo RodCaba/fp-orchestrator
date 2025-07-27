@@ -99,13 +99,15 @@ class Buffer:
                 'n_users': n_users,
                 'data': data_snapshot
             }
+
+            json_data = json.dumps(data_ob, indent=2)
             
             timestamp = time.strftime('%Y%m%d_%H%M%S', time.gmtime())
             key = f"{self.s3_prefix}{timestamp}_{upload_id}.json"
 
             logger.info(f"Uploading data to S3 with key: {key}")
 
-            self.s3_service.save(data_ob, key)
+            self.s3_service.save(json_data, key)
 
             return {
                 "success": True,
