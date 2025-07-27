@@ -66,7 +66,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         logger.info(f"Orchestrator status: {response.is_ready}, Current activity: {response.current_activity}")
         return response
 
-    async def ReceiveIMUData(self, request, context):
+    def ReceiveIMUData(self, request, context):
         """
         Receives IMU data and updates the system status.
         """
@@ -86,14 +86,19 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             self.system_status.total_batches_processed += 1
             
             # Update sensor status
-            asyncio.create_task(
-                self.wsocket_manager.broadcast_sensor_status("imu", "connected", self.sensor_stats["imu"])
-            )
+            try:
+                loop = asyncio.get_event_loop()
+                
+                loop.create_task(
+                    self.wsocket_manager.broadcast_sensor_status("imu", "connected", self.sensor_stats["imu"])
+                )
 
-            # Update stats
-            asyncio.create_task(
-                self.wsocket_manager.broadcast_stats_update(self.sensor_stats)
-            )
+                # Update stats
+                loop.create_task(
+                    self.wsocket_manager.broadcast_stats_update(self.sensor_stats)
+                )
+            except Exception as e:
+                logger.error(f"Error broadcasting sensor status: {e}")
 
             return imu_service_pb2.IMUPayloadResponse(
                 device_id=request.device_id,
