@@ -9,3 +9,4 @@ __pycache__/
 
 # Orchestrator utils package directory
 fp-orchestrator-utils/
+fp_orchestrator_utils/

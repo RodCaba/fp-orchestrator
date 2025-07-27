@@ -1,28 +1,27 @@
-from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from collections.abc import Mapping as _Mapping
 from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class IMUPayload(_message.Message):
-    __slots__ = ("device_id", "timestamp", "accelerometer", "gyroscope", "gravity", "total_acceleration", "orientation")
+    __slots__ = ("device_id", "timestamp", "data")
     DEVICE_ID_FIELD_NUMBER: _ClassVar[int]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
-    ACCELEROMETER_FIELD_NUMBER: _ClassVar[int]
-    GYROSCOPE_FIELD_NUMBER: _ClassVar[int]
-    GRAVITY_FIELD_NUMBER: _ClassVar[int]
-    TOTAL_ACCELERATION_FIELD_NUMBER: _ClassVar[int]
-    ORIENTATION_FIELD_NUMBER: _ClassVar[int]
+    DATA_FIELD_NUMBER: _ClassVar[int]
     device_id: str
     timestamp: float
-    accelerometer: _containers.RepeatedCompositeFieldContainer[SensorValues]
-    gyroscope: _containers.RepeatedCompositeFieldContainer[SensorValues]
-    gravity: _containers.RepeatedCompositeFieldContainer[SensorValues]
-    total_acceleration: _containers.RepeatedCompositeFieldContainer[SensorValues]
-    orientation: _containers.RepeatedCompositeFieldContainer[OrientationSensorValues]
-    def __init__(self, device_id: _Optional[str] = ..., timestamp: _Optional[float] = ..., accelerometer: _Optional[_Iterable[_Union[SensorValues, _Mapping]]] = ..., gyroscope: _Optional[_Iterable[_Union[SensorValues, _Mapping]]] = ..., gravity: _Optional[_Iterable[_Union[SensorValues, _Mapping]]] = ..., total_acceleration: _Optional[_Iterable[_Union[SensorValues, _Mapping]]] = ..., orientation: _Optional[_Iterable[_Union[OrientationSensorValues, _Mapping]]] = ...) -> None: ...
+    data: SensorData
+    def __init__(self, device_id: _Optional[str] = ..., timestamp: _Optional[float] = ..., data: _Optional[_Union[SensorData, _Mapping]] = ...) -> None: ...
+
+class SensorData(_message.Message):
+    __slots__ = ("sensor_type", "values")
+    SENSOR_TYPE_FIELD_NUMBER: _ClassVar[int]
+    VALUES_FIELD_NUMBER: _ClassVar[int]
+    sensor_type: str
+    values: SensorValues
+    def __init__(self, sensor_type: _Optional[str] = ..., values: _Optional[_Union[SensorValues, _Mapping]] = ...) -> None: ...
 
 class IMUPayloadResponse(_message.Message):
     __slots__ = ("device_id", "timestamp", "status")
@@ -35,6 +34,14 @@ class IMUPayloadResponse(_message.Message):
     def __init__(self, device_id: _Optional[str] = ..., timestamp: _Optional[float] = ..., status: _Optional[str] = ...) -> None: ...
 
 class SensorValues(_message.Message):
+    __slots__ = ("standard", "orientation")
+    STANDARD_FIELD_NUMBER: _ClassVar[int]
+    ORIENTATION_FIELD_NUMBER: _ClassVar[int]
+    standard: StandardSensorValues
+    orientation: OrientationSensorValues
+    def __init__(self, standard: _Optional[_Union[StandardSensorValues, _Mapping]] = ..., orientation: _Optional[_Union[OrientationSensorValues, _Mapping]] = ...) -> None: ...
+
+class StandardSensorValues(_message.Message):
     __slots__ = ("x", "y", "z")
     X_FIELD_NUMBER: _ClassVar[int]
     Y_FIELD_NUMBER: _ClassVar[int]
