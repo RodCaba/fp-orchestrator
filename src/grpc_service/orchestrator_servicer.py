@@ -41,7 +41,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             "audio": { "features_processed": 0 },
             "rfid": { "last_signal": None }
         }
-        self.buffer = Buffer(size=5000, wsocket_manager=wsocket_manager)
+        self.buffer = Buffer(size=10000, wsocket_manager=wsocket_manager)
         self.wsocket_manager = wsocket_manager   
         self.current_users = 0
 
@@ -76,11 +76,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         Receives IMU data and updates the system status.
         """
         try:
-            logger.info(f"=== IMU REQUEST DEBUG ===")
-            logger.info(f"Full request: {request}")
-            logger.info(f"Request type: {type(request)}")
-            logger.info(f"Request fields: {[field.name for field in request.DESCRIPTOR.fields]}")
-            logger.info(f"========================")
             if not self.system_status.orchestrator_ready or self.current_users == 0:
                 logger.warning("Orchestrator is not ready to receive IMU data")
                 return imu_service_pb2.IMUPayloadResponse(
