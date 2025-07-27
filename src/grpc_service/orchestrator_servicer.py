@@ -17,6 +17,7 @@ if grpc_path_str not in sys.path:
 try:
     import orchestrator_service_pb2  # type: ignore
     import orchestrator_service_pb2_grpc  # type: ignore
+    import imu_service_pb2  # type: ignore  
 except ImportError as e:
     logger.error(f"Failed to import gRPC modules: {e}")
     raise RuntimeError("gRPC modules could not be loaded. Ensure they are generated correctly.")
@@ -96,7 +97,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 self.wsocket_manager.broadcast_stats_update(self.sensor_stats)
             )
 
-            return orchestrator_service_pb2.IMUPayloadResponse(
+            return imu_service_pb2.IMUPayloadResponse(
                 device_id=request.device_id,
                 status="success"
             )
