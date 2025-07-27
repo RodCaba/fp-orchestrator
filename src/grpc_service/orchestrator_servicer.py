@@ -84,7 +84,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 )
             # Process the IMU data
             imu_data = self._proto_to_sensor_imu_data(request)
-            logger.info(f"Received IMU data from {imu_data.device_id} at {imu_data.timestamp}")
 
             # Update stats
             self.sensor_stats["imu"]["batches_received"] += 1
@@ -117,7 +116,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         try:
             # Process the RFID data
             self.sensor_stats["rfid"]["last_signal"] = datetime.now().isoformat()
-            logger.info(f"Received RFID data from {request.device_id}")
 
             # Update stats
             self.system_status.total_batches_processed += 1

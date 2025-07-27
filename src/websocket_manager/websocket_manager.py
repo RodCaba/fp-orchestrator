@@ -75,7 +75,6 @@ class WebSocketManager:
             "data": data or {}
         }
         await self.broadcast(message)
-        logger.info(f"Broadcasted sensor status update: {sensor_type} - {status}")
 
     async def broadcast_orchestrator_status(self, status: str, message: str):
         """
