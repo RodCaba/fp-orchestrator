@@ -113,11 +113,10 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             # Process the RFID data
             self.sensor_stats["rfid"]["last_signal"] = datetime.now().isoformat()
             logger.info(f"Received RFID data from {request.device_id}")
-            logger.info(f"RFID data: {request.data}")
 
             # Update stats
             self.system_status.total_batches_processed += 1
-            self.current_users = request.data.current_tags or 0
+            self.current_users = request.current_tags or 0
 
             # Update orchestrator readiness based on current users
             if self.current_users > 0:
