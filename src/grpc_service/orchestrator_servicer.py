@@ -74,7 +74,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         Receives IMU data and updates the system status.
         """
         try:
-            if not self.system_status.orchestrator_ready:
+            if not self.system_status.orchestrator_ready or self.current_users == 0:
                 logger.warning("Orchestrator is not ready to receive IMU data")
                 return orchestrator_service_pb2.IMUPayloadResponse(
                     device_id=request.device_id,
@@ -117,12 +117,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             # Update stats
             self.system_status.total_batches_processed += 1
             self.current_users = request.current_tags or 0
-
-            # Update orchestrator readiness based on current users
-            if self.current_users > 0:
-                self.system_status.orchestrator_ready = True
-            else:
-                self.system_status.orchestrator_ready = False
 
             # Broadcast RFID data via WebSocket
             self._handle_rfid_websocket_updates()
