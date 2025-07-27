@@ -113,6 +113,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             # Process the RFID data
             self.sensor_stats["rfid"]["last_signal"] = request.data.signal_strength
             logger.info(f"Received RFID data from {request.device_id}")
+            logger.info(f"RFID data: {request.data}")
 
             # Update stats
             self.system_status.total_batches_processed += 1
