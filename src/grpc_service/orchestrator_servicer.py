@@ -4,7 +4,7 @@ from ..models import SystemStatus
 from pathlib import Path
 import sys
 import grpc
-from ..models import SensorData
+from ..models import create_sensor_data
 from ..websocket_manager import WebSocketManager
 from ..buffer import Buffer
 from datetime import datetime
@@ -156,6 +156,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             # Broadcast audio data via WebSocket
             self._handle_audio_websocket_updates()
             audio_data = self._proto_to_sensor_audio_data(request)
+            logger.info(f"Processed audio data {audio_data}")
 
             # Add to buffer
             self._handle_buffer_upload(audio_data)
@@ -174,7 +175,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 status="error"
             )
         
-    def _handle_buffer_upload(self, data: SensorData):
+    def _handle_buffer_upload(self, data: dict):
         """
         Handles data upload to the buffer.
         """
@@ -189,7 +190,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
 
     def _proto_to_sensor_imu_data(self, request):
         """
-        Converts a protobuf IMU payload to a SensorData object.
+        Converts a protobuf IMU payload to a object.
         """
         if request.data.values.HasField("standard"):
             sensor_values = {
@@ -209,25 +210,47 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             }
         else:
             sensor_values = {}
-        return SensorData(
+        return create_sensor_data(
             device_id=request.device_id,
-            sensor_type=request.data.sensor_type,
+            sensor_type="imu",
             data=sensor_values,
             batch_id=f"batch_{int(time.time() * 1000)}"
         )
 
     def _proto_to_sensor_audio_data(self, request):
         """
-        Converts a protobuf audio payload to a SensorData object.
+        Converts a protobuf audio payload to a object.
         """
-        return SensorData(
+        audio_features = {
+            "feature_type": request.features.feature_type,
+            "feature_shape": request.features.feature_shape,
+            "feature_data": request.features.feature_data,
+            "feature_parameters": {
+                "n_ftt": request.features.feature_parameters.parameters.n_ftt,
+                "hop_length": request.features.feature_parameters.parameters.hop_length,
+                "n_mels": request.features.feature_parameters.parameters.n_mels,
+                "f_min": request.features.feature_parameters.parameters.f_min,
+                "f_max": request.features.feature_parameters.parameters.f_max,
+                "target_sample_rate": request.features.feature_parameters.parameters.target_sample_rate,
+                "power": request.features.feature_parameters.parameters.power
+            }
+        }
+
+        processing_parameters = {
+            "target_sample_rate": request.parameters.target_sample_rate,
+            "target_length": request.parameters.target_length,
+            "normalize": request.parameters.normalize,
+            "normalization_method": request.parameters.normalization_method,
+            "trim_strategy": request.parameters.trim_strategy,
+        }
+        return create_sensor_data(
             device_id=request.session_id,
             sensor_type="audio",
             data={
                 "channels": request.channels,
                 "sample_rate": request.sample_rate,
-                "features": request.features,
-                "parameters": request.parameters,
+                "features": audio_features,
+                "parameters": processing_parameters
             },
             batch_id=f"batch_{int(time.time() * 1000)}"
         )

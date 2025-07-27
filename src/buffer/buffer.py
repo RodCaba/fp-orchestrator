@@ -1,4 +1,3 @@
-from ..models import SensorData
 from ..websocket_manager import WebSocketManager
 from fp_orchestrator_utils import S3Config, S3Service
 import os
@@ -19,7 +18,7 @@ class Buffer:
         Initializes the buffer with a specific size and WebSocket manager.
         """
         self.size = size
-        self.data: list[SensorData] = []
+        self.data: list[dict] = []
         self.wsocket_manager = wsocket_manager
         self._lock = threading.Lock()
 
@@ -41,7 +40,7 @@ class Buffer:
             'lastUploadTime': None,
         }
 
-    def add(self, item: SensorData):
+    def add(self, item: dict):
         """ Add an item to the buffer."""
         with self._lock:
           self.data.append(item)
@@ -84,7 +83,7 @@ class Buffer:
 
     def _upload_data_to_s3(
             self,
-            data_snapshot: list[SensorData],
+            data_snapshot: list[dict],
             label: str,
             n_users: int
     ):
@@ -94,12 +93,11 @@ class Buffer:
         upload_id = int(time.time() * 1000)
 
         try:
-            data_to_upload = [item.model_dump() for item in data_snapshot]
             data_ob = {
                 'upload_id': upload_id,
                 'label': label,
                 'n_users': n_users,
-                'data': data_to_upload
+                'data': data_snapshot
             }
             
             timestamp = time.strftime('%Y%m%d_%H%M%S', time.gmtime())
@@ -147,7 +145,7 @@ class Buffer:
         
     def _handle_upload_failure(
             self,
-            failed_data: list[SensorData],
+            failed_data: list[dict],
             label: str,
             n_users: int,
             error: Exception
@@ -161,7 +159,7 @@ class Buffer:
             backup_data = {
                 'label': label,
                 'n_users': n_users,
-                'data': [item.model_dump() for item in failed_data],
+                'data': failed_data,
                 'error': str(error),
             }
             with open(os.path.join('backup', backup_file), 'w') as f:
