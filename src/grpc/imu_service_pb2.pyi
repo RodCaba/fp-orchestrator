@@ -6,14 +6,12 @@ from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class IMUPayload(_message.Message):
-    __slots__ = ("device_id", "timestamp", "data")
+    __slots__ = ("device_id", "data")
     DEVICE_ID_FIELD_NUMBER: _ClassVar[int]
-    TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
     device_id: str
-    timestamp: float
     data: SensorData
-    def __init__(self, device_id: _Optional[str] = ..., timestamp: _Optional[float] = ..., data: _Optional[_Union[SensorData, _Mapping]] = ...) -> None: ...
+    def __init__(self, device_id: _Optional[str] = ..., data: _Optional[_Union[SensorData, _Mapping]] = ...) -> None: ...
 
 class SensorData(_message.Message):
     __slots__ = ("sensor_type", "values")
@@ -24,14 +22,12 @@ class SensorData(_message.Message):
     def __init__(self, sensor_type: _Optional[str] = ..., values: _Optional[_Union[SensorValues, _Mapping]] = ...) -> None: ...
 
 class IMUPayloadResponse(_message.Message):
-    __slots__ = ("device_id", "timestamp", "status")
+    __slots__ = ("device_id", "status")
     DEVICE_ID_FIELD_NUMBER: _ClassVar[int]
-    TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     device_id: str
-    timestamp: float
     status: str
-    def __init__(self, device_id: _Optional[str] = ..., timestamp: _Optional[float] = ..., status: _Optional[str] = ...) -> None: ...
+    def __init__(self, device_id: _Optional[str] = ..., status: _Optional[str] = ...) -> None: ...
 
 class SensorValues(_message.Message):
     __slots__ = ("standard", "orientation")

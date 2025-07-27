@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11imu_service.proto\x12\x0bimu_service\"Y\n\nIMUPayload\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x01\x12%\n\x04\x64\x61ta\x18\x03 \x01(\x0b\x32\x17.imu_service.SensorData\"L\n\nSensorData\x12\x13\n\x0bsensor_type\x18\x01 \x01(\t\x12)\n\x06values\x18\x02 \x01(\x0b\x32\x19.imu_service.SensorValues\"J\n\x12IMUPayloadResponse\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x01\x12\x0e\n\x06status\x18\x03 \x01(\t\"\x91\x01\n\x0cSensorValues\x12\x35\n\x08standard\x18\x01 \x01(\x0b\x32!.imu_service.StandardSensorValuesH\x00\x12;\n\x0borientation\x18\x02 \x01(\x0b\x32$.imu_service.OrientationSensorValuesH\x00\x42\r\n\x0bsensor_data\"7\n\x14StandardSensorValues\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\t\n\x01z\x18\x03 \x01(\x01\"s\n\x17OrientationSensorValues\x12\n\n\x02qx\x18\x01 \x01(\x01\x12\n\n\x02qy\x18\x02 \x01(\x01\x12\n\n\x02qz\x18\x03 \x01(\x01\x12\n\n\x02qw\x18\x04 \x01(\x01\x12\x0c\n\x04roll\x18\x05 \x01(\x01\x12\r\n\x05pitch\x18\x06 \x01(\x01\x12\x0b\n\x03yaw\x18\x07 \x01(\x01\"\x14\n\x12HealthCheckRequest\"6\n\x13HealthCheckResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t2\xaa\x01\n\nIMUService\x12P\n\x0bHealthCheck\x12\x1f.imu_service.HealthCheckRequest\x1a .imu_service.HealthCheckResponse\x12J\n\x0eSendIMUPayload\x12\x17.imu_service.IMUPayload\x1a\x1f.imu_service.IMUPayloadResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11imu_service.proto\x12\x0bimu_service\"F\n\nIMUPayload\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12%\n\x04\x64\x61ta\x18\x03 \x01(\x0b\x32\x17.imu_service.SensorData\"L\n\nSensorData\x12\x13\n\x0bsensor_type\x18\x01 \x01(\t\x12)\n\x06values\x18\x02 \x01(\x0b\x32\x19.imu_service.SensorValues\"7\n\x12IMUPayloadResponse\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x03 \x01(\t\"\x91\x01\n\x0cSensorValues\x12\x35\n\x08standard\x18\x01 \x01(\x0b\x32!.imu_service.StandardSensorValuesH\x00\x12;\n\x0borientation\x18\x02 \x01(\x0b\x32$.imu_service.OrientationSensorValuesH\x00\x42\r\n\x0bsensor_data\"7\n\x14StandardSensorValues\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\t\n\x01z\x18\x03 \x01(\x01\"s\n\x17OrientationSensorValues\x12\n\n\x02qx\x18\x01 \x01(\x01\x12\n\n\x02qy\x18\x02 \x01(\x01\x12\n\n\x02qz\x18\x03 \x01(\x01\x12\n\n\x02qw\x18\x04 \x01(\x01\x12\x0c\n\x04roll\x18\x05 \x01(\x01\x12\r\n\x05pitch\x18\x06 \x01(\x01\x12\x0b\n\x03yaw\x18\x07 \x01(\x01\"\x14\n\x12HealthCheckRequest\"6\n\x13HealthCheckResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t2\xaa\x01\n\nIMUService\x12P\n\x0bHealthCheck\x12\x1f.imu_service.HealthCheckRequest\x1a .imu_service.HealthCheckResponse\x12J\n\x0eSendIMUPayload\x12\x17.imu_service.IMUPayload\x1a\x1f.imu_service.IMUPayloadResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,21 +32,21 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'imu_service_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_IMUPAYLOAD']._serialized_start=34
-  _globals['_IMUPAYLOAD']._serialized_end=123
-  _globals['_SENSORDATA']._serialized_start=125
-  _globals['_SENSORDATA']._serialized_end=201
-  _globals['_IMUPAYLOADRESPONSE']._serialized_start=203
-  _globals['_IMUPAYLOADRESPONSE']._serialized_end=277
-  _globals['_SENSORVALUES']._serialized_start=280
-  _globals['_SENSORVALUES']._serialized_end=425
-  _globals['_STANDARDSENSORVALUES']._serialized_start=427
-  _globals['_STANDARDSENSORVALUES']._serialized_end=482
-  _globals['_ORIENTATIONSENSORVALUES']._serialized_start=484
-  _globals['_ORIENTATIONSENSORVALUES']._serialized_end=599
-  _globals['_HEALTHCHECKREQUEST']._serialized_start=601
-  _globals['_HEALTHCHECKREQUEST']._serialized_end=621
-  _globals['_HEALTHCHECKRESPONSE']._serialized_start=623
-  _globals['_HEALTHCHECKRESPONSE']._serialized_end=677
-  _globals['_IMUSERVICE']._serialized_start=680
-  _globals['_IMUSERVICE']._serialized_end=850
+  _globals['_IMUPAYLOAD']._serialized_end=104
+  _globals['_SENSORDATA']._serialized_start=106
+  _globals['_SENSORDATA']._serialized_end=182
+  _globals['_IMUPAYLOADRESPONSE']._serialized_start=184
+  _globals['_IMUPAYLOADRESPONSE']._serialized_end=239
+  _globals['_SENSORVALUES']._serialized_start=242
+  _globals['_SENSORVALUES']._serialized_end=387
+  _globals['_STANDARDSENSORVALUES']._serialized_start=389
+  _globals['_STANDARDSENSORVALUES']._serialized_end=444
+  _globals['_ORIENTATIONSENSORVALUES']._serialized_start=446
+  _globals['_ORIENTATIONSENSORVALUES']._serialized_end=561
+  _globals['_HEALTHCHECKREQUEST']._serialized_start=563
+  _globals['_HEALTHCHECKREQUEST']._serialized_end=583
+  _globals['_HEALTHCHECKRESPONSE']._serialized_start=585
+  _globals['_HEALTHCHECKRESPONSE']._serialized_end=639
+  _globals['_IMUSERVICE']._serialized_start=642
+  _globals['_IMUSERVICE']._serialized_end=812
 # @@protoc_insertion_point(module_scope)
