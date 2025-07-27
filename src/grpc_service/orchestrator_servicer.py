@@ -22,6 +22,7 @@ try:
     import orchestrator_service_pb2_grpc  # type: ignore
     import imu_service_pb2  # type: ignore  
     import rfid_service_pb2  # type: ignore
+    import audio_service_pb2  # type: ignore
 except ImportError as e:
     logger.error(f"Failed to import gRPC modules: {e}")
     raise RuntimeError("gRPC modules could not be loaded. Ensure they are generated correctly.")
@@ -131,6 +132,38 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details("Internal server error")
             return rfid_service_pb2.RFIDPayloadResponse(
+                device_id=request.device_id,
+                status="error"
+            )
+
+    def ReceiveAudioData(self, request, context):
+        """
+        Receives audio data and updates the system status.
+        """
+        try:
+            if not self.system_status.orchestrator_ready or self.current_users == 0:
+                logger.warning("Orchestrator is not ready to receive audio data")
+                return audio_service_pb2.AudioPayloadResponse(
+                    device_id=request.device_id,
+                    status="rejected_not_ready"
+                )
+            # Process the audio data
+            self.sensor_stats["audio"]["features_processed"] += 1
+            self.system_status.total_batches_processed += 1
+            
+            # Broadcast audio data via WebSocket
+            self.wsocket_manager.broadcast_sensor_status("audio", "connected", {})
+
+            return audio_service_pb2.AudioPayloadResponse(
+                device_id=request.device_id,
+                status="success"
+            )
+
+        except Exception as e:
+            logger.error(f"Error processing audio data: {e}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details("Internal server error")
+            return audio_service_pb2.AudioPayloadResponse(
                 device_id=request.device_id,
                 status="error"
             )
