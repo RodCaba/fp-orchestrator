@@ -97,7 +97,6 @@ class WebSocketManager:
             "stats": stats
         }
         await self.broadcast(message)
-        logger.info(f"Broadcasted stats update for {stats}")
 
     async def broadcast_s3_stats_update(self, s3_stats: Dict[str, Any]):
         """
