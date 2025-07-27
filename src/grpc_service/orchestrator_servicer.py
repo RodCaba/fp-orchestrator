@@ -72,7 +72,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 logger.warning("Orchestrator is not ready to receive IMU data")
                 return orchestrator_service_pb2.IMUPayloadResponse(
                     device_id=request.device_id,
-                    timestamp=request.timestamp,
                     status="rejected_not_ready"
                 )
             # Process the IMU data
@@ -99,7 +98,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
 
             return orchestrator_service_pb2.IMUPayloadResponse(
                 device_id=request.device_id,
-                timestamp=request.timestamp,
                 status="success"
             )
 
