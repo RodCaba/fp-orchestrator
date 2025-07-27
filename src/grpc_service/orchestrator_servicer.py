@@ -100,7 +100,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             logger.error(f"Error checking orchestrator status: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details("Internal server error")
-            return orchestrator_service_pb2.IMUPayloadResponse(
+            return imu_service_pb2.IMUPayloadResponse(
                 device_id=request.device_id,
                 status="error"
             )
