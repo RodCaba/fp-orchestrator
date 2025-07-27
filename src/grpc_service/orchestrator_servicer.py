@@ -21,6 +21,7 @@ try:
     import orchestrator_service_pb2  # type: ignore
     import orchestrator_service_pb2_grpc  # type: ignore
     import imu_service_pb2  # type: ignore  
+    import rfid_service_pb2  # type: ignore
 except ImportError as e:
     logger.error(f"Failed to import gRPC modules: {e}")
     raise RuntimeError("gRPC modules could not be loaded. Ensure they are generated correctly.")
@@ -40,6 +41,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         }
         self.imu_buffer = []
         self.wsocket_manager = wsocket_manager   
+        self.current_users = 0
 
     def HealthCheck(self, request, context):
         """
@@ -103,6 +105,42 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 status="error"
             )
 
+    def ReceiveRFIDData(self, request, context):
+        """
+        Receives RFID data and updates the system status.
+        """
+        try:
+            # Process the RFID data
+            self.sensor_stats["rfid"]["last_signal"] = request.data.signal_strength
+            logger.info(f"Received RFID data from {request.device_id}")
+
+            # Update stats
+            self.system_status.total_batches_processed += 1
+            self.current_users = request.data.current_tags or 0
+
+            # Update orchestrator readiness based on current users
+            if self.current_users > 0:
+                self.system_status.orchestrator_ready = True
+            else:
+                self.system_status.orchestrator_ready = False
+
+            # Broadcast RFID data via WebSocket
+            self._handle_rfid_websocket_updates()
+
+            return rfid_service_pb2.RFIDPayloadResponse(
+                device_id=request.device_id,
+                status="success"
+            )
+
+        except Exception as e:
+            logger.error(f"Error processing RFID data: {e}")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details("Internal server error")
+            return rfid_service_pb2.RFIDPayloadResponse(
+                device_id=request.device_id,
+                status="error"
+            )
+
     def _proto_to_sensor_imu_data(self, request):
         """
         Converts a protobuf IMU payload to a SensorData object.
@@ -151,6 +189,31 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 )
             except Exception as e:
                 logger.error(f"Error broadcasting IMU data: {e}")
+
+            finally:
+                if loop:
+                    loop.close()
+        thread = threading.Thread(target=run_async_updates, daemon=True)
+        thread.start()
+
+    def _handle_rfid_websocket_updates(self):
+        """
+        Handles WebSocket updates for RFID data.
+        """
+        def run_async_updates():
+            loop = None
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+
+                loop.run_until_complete(
+                    self.wsocket_manager.broadcast_sensor_status("rfid", "connected", {
+                        "last_signal": self.sensor_stats["rfid"]["last_signal"],
+                        "current_users": self.current_users
+                    })
+                )
+            except Exception as e:
+                logger.error(f"Error broadcasting RFID data: {e}")
 
             finally:
                 if loop:

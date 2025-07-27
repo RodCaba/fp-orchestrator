@@ -225,6 +225,7 @@ class HARDashboard {
         // Update sensor-specific data
         if (sensorType === 'rfid' && data.last_signal) {
             document.getElementById('rfid-last-signal').textContent = data.last_signal;
+            document.getElementById('rfid-current-users').textContent = data.current_users || 0;
         } else if (sensorType === 'imu' && data.batches_received !== undefined) {
             document.getElementById('imu-batches').textContent = data.batches_received;
         } else if (sensorType === 'audio' && data.features_processed !== undefined) {
