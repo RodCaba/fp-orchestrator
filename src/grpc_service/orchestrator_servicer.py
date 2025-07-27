@@ -41,7 +41,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             "audio": { "features_processed": 0 },
             "rfid": { "last_signal": None }
         }
-        self.buffer = Buffer(size=5, wsocket_manager=wsocket_manager)
+        self.buffer = Buffer(size=5000, wsocket_manager=wsocket_manager)
         self.wsocket_manager = wsocket_manager   
         self.current_users = 0
 
