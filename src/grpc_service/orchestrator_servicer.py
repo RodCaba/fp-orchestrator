@@ -221,6 +221,21 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         """
         Converts a protobuf audio payload to a object.
         """
+        # Debug: Log the request structure
+        logger.info(f"=== AUDIO REQUEST DEBUG ===")
+        logger.info(f"Request type: {type(request)}")
+        logger.info(f"Available fields: {[field.name for field in request.DESCRIPTOR.fields]}")
+        
+        # Check each field safely
+        for field in request.DESCRIPTOR.fields:
+            field_name = field.name
+            try:
+                field_value = getattr(request, field_name)
+                logger.info(f"Field '{field_name}': {field_value}")
+            except Exception as e:
+                logger.warning(f"Could not access field '{field_name}': {e}")
+        
+        logger.info(f"========================")
         audio_features = {
             "feature_type": request.features.feature_type,
             "feature_shape": request.features.feature_shape,
