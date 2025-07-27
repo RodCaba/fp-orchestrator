@@ -159,7 +159,6 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             # Broadcast audio data via WebSocket
             self._handle_audio_websocket_updates()
             audio_data = self._proto_to_sensor_audio_data(request)
-            logger.info(f"Processed audio data {audio_data}")
 
             # Add to buffer
             self._handle_buffer_upload(audio_data)
