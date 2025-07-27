@@ -19,23 +19,19 @@ class HealthCheckResponse(_message.Message):
     def __init__(self, status: _Optional[str] = ..., message: _Optional[str] = ...) -> None: ...
 
 class RFIDPayload(_message.Message):
-    __slots__ = ("device_id", "timestamp", "tags", "is_active")
+    __slots__ = ("device_id", "tags", "current_tags")
     DEVICE_ID_FIELD_NUMBER: _ClassVar[int]
-    TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
-    IS_ACTIVE_FIELD_NUMBER: _ClassVar[int]
+    CURRENT_TAGS_FIELD_NUMBER: _ClassVar[int]
     device_id: str
-    timestamp: float
     tags: _containers.RepeatedScalarFieldContainer[str]
-    is_active: bool
-    def __init__(self, device_id: _Optional[str] = ..., timestamp: _Optional[float] = ..., tags: _Optional[_Iterable[str]] = ..., is_active: bool = ...) -> None: ...
+    current_tags: int
+    def __init__(self, device_id: _Optional[str] = ..., tags: _Optional[_Iterable[str]] = ..., current_tags: _Optional[int] = ...) -> None: ...
 
 class RFIDPayloadResponse(_message.Message):
-    __slots__ = ("device_id", "timestamp", "status")
+    __slots__ = ("device_id", "status")
     DEVICE_ID_FIELD_NUMBER: _ClassVar[int]
-    TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     device_id: str
-    timestamp: float
     status: str
-    def __init__(self, device_id: _Optional[str] = ..., timestamp: _Optional[float] = ..., status: _Optional[str] = ...) -> None: ...
+    def __init__(self, device_id: _Optional[str] = ..., status: _Optional[str] = ...) -> None: ...

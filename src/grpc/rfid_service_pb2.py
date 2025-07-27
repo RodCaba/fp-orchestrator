@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12rfid_service.proto\x12\x0crfid_service\"\x14\n\x12HealthCheckRequest\"6\n\x13HealthCheckResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"T\n\x0bRFIDPayload\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x01\x12\x0c\n\x04tags\x18\x03 \x03(\t\x12\x11\n\tis_active\x18\x04 \x01(\x08\"K\n\x13RFIDPayloadResponse\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x11\n\ttimestamp\x18\x02 \x01(\x01\x12\x0e\n\x06status\x18\x03 \x01(\t2\xb2\x01\n\x0bRFIDService\x12R\n\x0bHealthCheck\x12 .rfid_service.HealthCheckRequest\x1a!.rfid_service.HealthCheckResponse\x12O\n\x0fSendRFIDPayload\x12\x19.rfid_service.RFIDPayload\x1a!.rfid_service.RFIDPayloadResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12rfid_service.proto\x12\x0crfid_service\"\x14\n\x12HealthCheckRequest\"6\n\x13HealthCheckResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"D\n\x0bRFIDPayload\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x0c\n\x04tags\x18\x02 \x03(\t\x12\x14\n\x0c\x63urrent_tags\x18\x03 \x01(\x05\"8\n\x13RFIDPayloadResponse\x12\x11\n\tdevice_id\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t2\xb2\x01\n\x0bRFIDService\x12R\n\x0bHealthCheck\x12 .rfid_service.HealthCheckRequest\x1a!.rfid_service.HealthCheckResponse\x12O\n\x0fSendRFIDPayload\x12\x19.rfid_service.RFIDPayload\x1a!.rfid_service.RFIDPayloadResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,9 +36,9 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_HEALTHCHECKRESPONSE']._serialized_start=58
   _globals['_HEALTHCHECKRESPONSE']._serialized_end=112
   _globals['_RFIDPAYLOAD']._serialized_start=114
-  _globals['_RFIDPAYLOAD']._serialized_end=198
-  _globals['_RFIDPAYLOADRESPONSE']._serialized_start=200
-  _globals['_RFIDPAYLOADRESPONSE']._serialized_end=275
-  _globals['_RFIDSERVICE']._serialized_start=278
-  _globals['_RFIDSERVICE']._serialized_end=456
+  _globals['_RFIDPAYLOAD']._serialized_end=182
+  _globals['_RFIDPAYLOADRESPONSE']._serialized_start=184
+  _globals['_RFIDPAYLOADRESPONSE']._serialized_end=240
+  _globals['_RFIDSERVICE']._serialized_start=243
+  _globals['_RFIDSERVICE']._serialized_end=421
 # @@protoc_insertion_point(module_scope)

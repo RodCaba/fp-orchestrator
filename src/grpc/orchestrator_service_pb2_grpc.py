@@ -5,6 +5,7 @@ import warnings
 
 import imu_service_pb2 as imu__service__pb2
 import orchestrator_service_pb2 as orchestrator__service__pb2
+import rfid_service_pb2 as rfid__service__pb2
 
 GRPC_GENERATED_VERSION = '1.73.1'
 GRPC_VERSION = grpc.__version__
@@ -50,6 +51,11 @@ class OrchestratorServiceStub(object):
                 request_serializer=imu__service__pb2.IMUPayload.SerializeToString,
                 response_deserializer=imu__service__pb2.IMUPayloadResponse.FromString,
                 _registered_method=True)
+        self.ReceiveRFIDData = channel.unary_unary(
+                '/orchestrator_service.OrchestratorService/ReceiveRFIDData',
+                request_serializer=rfid__service__pb2.RFIDPayload.SerializeToString,
+                response_deserializer=rfid__service__pb2.RFIDPayloadResponse.FromString,
+                _registered_method=True)
 
 
 class OrchestratorServiceServicer(object):
@@ -76,6 +82,13 @@ class OrchestratorServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ReceiveRFIDData(self, request, context):
+        """Receive RFID data from RFID sensor
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_OrchestratorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -93,6 +106,11 @@ def add_OrchestratorServiceServicer_to_server(servicer, server):
                     servicer.ReceiveIMUData,
                     request_deserializer=imu__service__pb2.IMUPayload.FromString,
                     response_serializer=imu__service__pb2.IMUPayloadResponse.SerializeToString,
+            ),
+            'ReceiveRFIDData': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReceiveRFIDData,
+                    request_deserializer=rfid__service__pb2.RFIDPayload.FromString,
+                    response_serializer=rfid__service__pb2.RFIDPayloadResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -176,6 +194,33 @@ class OrchestratorService(object):
             '/orchestrator_service.OrchestratorService/ReceiveIMUData',
             imu__service__pb2.IMUPayload.SerializeToString,
             imu__service__pb2.IMUPayloadResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ReceiveRFIDData(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/orchestrator_service.OrchestratorService/ReceiveRFIDData',
+            rfid__service__pb2.RFIDPayload.SerializeToString,
+            rfid__service__pb2.RFIDPayloadResponse.FromString,
             options,
             channel_credentials,
             insecure,
