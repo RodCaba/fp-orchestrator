@@ -6,6 +6,8 @@ import sys
 import grpc
 from ..models import SensorData
 from ..websocket_manager import WebSocketManager
+from datetime import datetime
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -76,11 +78,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                     status="rejected_not_ready"
                 )
             # Process the IMU data
-            imu_data = SensorData(
-                device_id=request.device_id,
-                timestamp=request.timestamp,
-                data=request.data
-            )
+            imu_data = self._proto_to_sensor_imu_data(request)
             logger.info(f"Received IMU data from {imu_data.device_id} at {imu_data.timestamp}")
 
             # Update stats
@@ -108,6 +106,35 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             context.set_details("Internal server error")
             return orchestrator_service_pb2.IMUPayloadResponse(
                 device_id=request.device_id,
-                timestamp=request.timestamp,
                 status="error"
             )
+
+    def _proto_to_sensor_imu_data(self, request):
+        """
+        Converts a protobuf IMU payload to a SensorData object.
+        """
+        if request.data.values.HasField("standard"):
+            sensor_values = {
+                "x": request.data.values.standard.x,
+                "y": request.data.values.standard.y,
+                "z": request.data.values.standard.z
+            }
+        elif request.data.values.HasField("orientation"):
+            sensor_values = {
+                "qx": request.data.values.orientation.qx,
+                "qy": request.data.values.orientation.qy,
+                "qz": request.data.values.orientation.qz,
+                "qw": request.data.values.orientation.qw,
+                "roll": request.data.values.orientation.roll,
+                "pitch": request.data.values.orientation.pitch,
+                "yaw": request.data.values.orientation.yaw
+            }
+        else:
+            sensor_values = {}
+        return SensorData(
+            device_id=request.device_id,
+            sensor_type=request.data.sensor_type,
+            timestamp=datetime.now(),
+            data=sensor_values,
+            batch_id=f"batch_{int(time.time() * 1000)}"
+        )

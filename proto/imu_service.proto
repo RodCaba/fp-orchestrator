@@ -13,29 +13,36 @@ service IMUService {
 // The IMUPayload message contains sensor data from an IMU device.
 message IMUPayload {
   string device_id = 1;
-  double timestamp = 2; // Unix timestamp in seconds
-  repeated SensorValues accelerometer = 3;
-  repeated SensorValues gyroscope = 4;
-  repeated SensorValues gravity = 5;
-  repeated SensorValues total_acceleration = 6;
-  repeated OrientationSensorValues orientation = 7;
+  SensorData data = 2;
+}
+
+message SensorData {
+  string sensor_type = 1; // e.g., "accelerometer", "gyroscope"
+  SensorValues values = 2; // Sensor values for the specific sensor type
 }
 
 // The IMUPayloadResponse message is used to acknowledge the receipt of the IMU payload.
 message IMUPayloadResponse {
   string device_id = 1;
-  double timestamp = 2; // Unix timestamp in seconds
-  string status = 3; // e.g., "success", "error"
+  string status = 2; // e.g., "success", "error"
 }
 
 // The SensorValues message represents a single sensor reading with x, y, and z components.
 message SensorValues {
+  oneof sensor_data {
+    StandardSensorValues standard = 1;
+    OrientationSensorValues orientation = 2;
+  }
+}
+
+// Standard sensor values for accelerometer, gyroscope, etc.
+message StandardSensorValues {
   double x = 1;
   double y = 2;
   double z = 3;
 }
 
-// The OrientationSensorValues message represents orientation data with quaternion and Euler angles.
+// Orientation sensor values with quaternion and Euler angles.
 message OrientationSensorValues {
   double qx = 1;
   double qy = 2;

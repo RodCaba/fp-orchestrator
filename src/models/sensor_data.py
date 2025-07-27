@@ -8,7 +8,7 @@ class SensorData(BaseModel):
     Represents the data from a sensor.
     """
     sensor_type: str
-    user_id: Optional[str] = None
+    device_id: Optional[str] = None
     timestamp: datetime
     data: Dict[str, Any]
     batch_id: Optional[str] = None
