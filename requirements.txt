@@ -1,10 +1,12 @@
 # Core
 fastapi==0.116.1
 websockets==15.0.1
-fp-orchestrator-utils==0.1.1
 uvicorn==0.23.2
 jinja2==3.1.4
 pydantic==2.11.7
 
 # Testing
 pytest==7.00
+
+# Utilities
+fp-orchestrator-utils==0.1.1
