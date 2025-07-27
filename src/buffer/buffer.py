@@ -94,7 +94,7 @@ class Buffer:
         upload_id = int(time.time() * 1000)
 
         try:
-            data_to_upload = [item.to_dict() for item in data_snapshot]
+            data_to_upload = [item.model_dump() for item in data_snapshot]
             data_ob = {
                 'upload_id': upload_id,
                 'label': label,
@@ -161,7 +161,7 @@ class Buffer:
             backup_data = {
                 'label': label,
                 'n_users': n_users,
-                'data': [item.to_dict() for item in failed_data],
+                'data': [item.model_dump() for item in failed_data],
                 'error': str(error),
                 'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
             }
