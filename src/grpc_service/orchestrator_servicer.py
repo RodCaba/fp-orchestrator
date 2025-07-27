@@ -10,6 +10,9 @@ from ..buffer import Buffer
 from datetime import datetime
 import time
 import threading
+import numpy as np
+import struct
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -221,54 +224,88 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         """
         Converts a protobuf audio payload to a object.
         """
-        # Debug: Log the request structure
-        logger.info(f"=== AUDIO REQUEST DEBUG ===")
-        logger.info(f"Request type: {type(request)}")
-        logger.info(f"Available fields: {[field.name for field in request.DESCRIPTOR.fields]}")
-        
-        # Check each field safely
-        for field in request.DESCRIPTOR.fields:
-            field_name = field.name
-            try:
-                field_value = getattr(request, field_name)
-                logger.info(f"Field '{field_name}': {field_value}")
-            except Exception as e:
-                logger.warning(f"Could not access field '{field_name}': {e}")
-        
-        logger.info(f"========================")
-        audio_features = {
-            "feature_type": request.features.feature_type,
-            "feature_shape": request.features.feature_shape,
-            "feature_data": request.features.feature_data,
-            "feature_parameters": {
-                "n_fft": request.features.feature_parameters.n_fft,
-                "hop_length": request.features.feature_parameters.hop_length,
-                "n_mels": request.features.feature_parameters.n_mels,
-                "f_min": request.features.feature_parameters.f_min,
-                "f_max": request.features.feature_parameters.f_max,
-                "target_sample_rate": request.features.feature_parameters.target_sample_rate,
-                "power": request.features.feature_parameters.power
-            }
-        }
+        try:
+            feature_data_bytes = request.features.feature_data
 
-        processing_parameters = {
-            "target_sample_rate": request.parameters.target_sample_rate,
-            "target_length": request.parameters.target_length,
-            "normalize": request.parameters.normalize,
-            "normalization_method": request.parameters.normalization_method,
-            "trim_strategy": request.parameters.trim_strategy,
-        }
-        return create_sensor_data(
-            device_id=request.session_id,
-            sensor_type="audio",
-            data={
-                "channels": request.channels,
-                "sample_rate": request.sample_rate,
-                "features": audio_features,
-                "parameters": processing_parameters
-            },
-            batch_id=f"batch_{int(time.time() * 1000)}"
-        )
+            # Conver bytes to float32 array
+            num_floats = len(feature_data_bytes) // 4
+            feature_data_floats = struct.unpack(f'{num_floats}f', feature_data_bytes)
+
+            # Reshape to feature shape if provided
+            feature_shape = list(request.features.feature_shape)
+            if feature_shape and len(feature_shape) > 1:
+                feature_data_array = np.array(feature_data_floats).reshape(feature_shape[1:])
+                feature_data_list = feature_data_array.tolist()
+            else:
+                feature_data_list = feature_data_floats
+
+            audio_features = {
+                "feature_type": str(request.features.feature_type),
+                "feature_shape": feature_shape,
+                "feature_data": feature_data_list,
+                "feature_parameters": {
+                    "n_fft": int(request.features.feature_parameters.n_fft),
+                    "hop_length": int(request.features.feature_parameters.hop_length),
+                    "n_mels": int(request.features.feature_parameters.n_mels),
+                    "f_min": float(request.features.feature_parameters.f_min),
+                    "f_max": float(request.features.feature_parameters.f_max),
+                    "target_sample_rate": int(request.features.feature_parameters.target_sample_rate),
+                    "power": request.features.feature_parameters.power
+                }
+            }
+
+            processing_parameters = {
+                "target_sample_rate": int(request.parameters.target_sample_rate),
+                "target_length": int(request.parameters.target_length),
+                "normalize": bool(request.parameters.normalize),
+                "normalization_method": str(request.parameters.normalization_method),
+                "trim_strategy": str(request.parameters.trim_strategy),
+            }
+
+            return create_sensor_data(
+                device_id=str(request.session_id),
+                sensor_type="audio",
+                data={
+                    "channels": int(request.channels),
+                    "sample_rate": int(request.sample_rate),
+                    "features": audio_features,
+                    "parameters": processing_parameters
+                },
+                batch_id=f"batch_{int(time.time() * 1000)}"
+            )
+        except Exception as e:
+            logger.error(f"Error converting audio payload: {e}")
+            # Fallback to base64
+            return create_sensor_data(
+                device_id=str(request.session_id),
+                sensor_type="audio",
+                data={
+                    "channels": int(request.channels),
+                    "sample_rate": int(request.sample_rate),
+                    "features": {
+                        "feature_type": str(request.features.feature_type),
+                        "feature_shape": list(request.features.feature_shape),
+                        "feature_data": base64.b64encode(request.features.feature_data).decode('utf-8'),
+                        "feature_parameters": {
+                            "n_fft": int(request.features.feature_parameters.n_fft),
+                            "hop_length": int(request.features.feature_parameters.hop_length),
+                            "n_mels": int(request.features.feature_parameters.n_mels),
+                            "f_min": float(request.features.feature_parameters.f_min),
+                            "f_max": float(request.features.feature_parameters.f_max),
+                            "target_sample_rate": int(request.features.feature_parameters.target_sample_rate),
+                            "power": request.features.feature_parameters.power
+                        }
+                    },
+                    "parameters": {
+                        "target_sample_rate": int(request.parameters.target_sample_rate),
+                        "target_length": int(request.parameters.target_length),
+                        "normalize": bool(request.parameters.normalize),
+                        "normalization_method": str(request.parameters.normalization_method),
+                        "trim_strategy": str(request.parameters.trim_strategy)
+                    }
+                },
+                batch_id=f"batch_{int(time.time() * 1000)}"
+            )
     
     def _handle_imu_websocket_updates(self):
         """
