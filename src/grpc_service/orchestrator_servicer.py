@@ -138,8 +138,9 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         Handles WebSocket updates for IMU data.
         """
         def run_async_updates():
+            loop = None
             try:
-                loop = asyncio.get_event_loop()
+                loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
 
                 loop.run_until_complete(
@@ -152,6 +153,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 logger.error(f"Error broadcasting IMU data: {e}")
 
             finally:
-                loop.close()
+                if loop:
+                    loop.close()
         thread = threading.Thread(target=run_async_updates, daemon=True)
         thread.start()
