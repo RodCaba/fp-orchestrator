@@ -214,7 +214,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             sensor_values = {}
         return create_sensor_data(
             device_id=request.device_id,
-            sensor_type="imu",
+            sensor_type=request.data.sensor_type,
             data=sensor_values,
             batch_id=f"batch_{int(time.time() * 1000)}"
         )
