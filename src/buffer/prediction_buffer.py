@@ -115,7 +115,7 @@ class PredictionBuffer(Buffer):
            result = self.inference_engine.predict(data_obj)
            parsed_result = PredictionResult(
                predicted_label=result['predicted_class_names'][0],
-               confidence=result['predicted_probabilities']['predictions'][0],
+               confidence=result['probabilities']['predictions'][0],
                timestamp=datetime.now(),
                n_users=self.n_users
            )
