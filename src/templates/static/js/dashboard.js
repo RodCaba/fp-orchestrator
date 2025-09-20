@@ -211,7 +211,7 @@ class HARDashboard {
             if (response.ok) {
                 this.predictionActive = true;
                 this.updatePredictionControls();
-                this.updatePredictionState('waiting', 'Waiting for RFID detection...');
+                this.updatePredictionState('waiting', 'Loading...');
                 this.showToast('Prediction mode started', 'success');
             } else {
                 const error = await response.text();
@@ -377,7 +377,7 @@ class HARDashboard {
             this.updatePredictionControls();
             
             if (data.waiting_for_rfid) {
-                this.updatePredictionState('waiting', 'Waiting for RFID detection...');
+                this.updatePredictionState('waiting', 'Loading...');
                 this.hidePredictionProgress();
             } else if (data.collecting_data) {
                 this.updatePredictionState('collecting', 'Collecting sensor data...');
