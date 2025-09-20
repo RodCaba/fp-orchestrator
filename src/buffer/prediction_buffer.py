@@ -85,10 +85,15 @@ class PredictionBuffer(Buffer):
            logger.error(f"Error during synchronous prediction: {e}")
        finally:
            # Reset buffer and restart the cycle automatically
+           logger.info("Entering finally block - cleaning up prediction")
            self._clear()
            self.is_collecting = False
            
            if self.orchestrator_servicer:
+               logger.info(f"Orchestrator servicer available - checking conditions")
+               logger.info(f"Prediction active: {self.orchestrator_servicer.system_status.prediction_status.is_active}")
+               logger.info(f"Current users: {self.orchestrator_servicer.current_users}")
+               
                # Only restart if prediction mode is still active and users are present
                if (self.orchestrator_servicer.system_status.prediction_status.is_active and 
                    self.orchestrator_servicer.current_users > 0):
@@ -101,17 +106,24 @@ class PredictionBuffer(Buffer):
                    self.orchestrator_servicer.system_status.prediction_status.collecting_data = True
                    self.orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
                    
+                   logger.info("Orchestrator set back to ready - should accept new data")
+                   
                    # Broadcast status update - collecting for next cycle
                    self._broadcast_prediction_status("collecting", "Collecting data for next prediction...")
                else:
+                   logger.info("Prediction stopped or no users - setting orchestrator ready but waiting")
                    # No users detected or prediction mode stopped
                    self.orchestrator_servicer.system_status.orchestrator_ready = True
                    self.orchestrator_servicer.system_status.prediction_status.collecting_data = False
                    self.orchestrator_servicer.system_status.prediction_status.waiting_for_rfid = True
                    self.orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
                    
+                   logger.info("Orchestrator set back to ready - waiting for users")
+                   
                    # Broadcast status update - waiting for users
                    self._broadcast_prediction_status("waiting", "Waiting for users to be detected...")
+           else:
+               logger.warning("No orchestrator servicer reference available in finally block")
 
    def _predict_synchronous(self) -> Optional[PredictionResult]:
        """
