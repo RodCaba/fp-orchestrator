@@ -113,6 +113,7 @@ class PredictionBuffer(Buffer):
                'data': self.data
            }
            result = self.inference_engine.predict(data_obj)
+           logger.info(f"Raw prediction result: {result}")
            parsed_result = PredictionResult(
                predicted_label=result['predicted_class_names'][0],
                confidence=result['probabilities']['predictions'][0],
