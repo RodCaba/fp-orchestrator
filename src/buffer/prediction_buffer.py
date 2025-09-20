@@ -90,26 +90,20 @@ class PredictionBuffer:
            self.is_collecting = False
            
            if self.orchestrator_servicer:
-               logger.info(f"Orchestrator servicer available - checking conditions")
-               logger.info(f"Prediction active: {self.orchestrator_servicer.system_status.prediction_status.is_active}")
-               logger.info(f"Current users: {self.orchestrator_servicer.current_users}")
                
                # CRITICAL: Set orchestrator ready IMMEDIATELY to prevent blocking
                self.orchestrator_servicer.system_status.orchestrator_ready = True
-               logger.info("Orchestrator set back to ready IMMEDIATELY")
                
                # Only restart if prediction mode is still active and users are present
                if (self.orchestrator_servicer.system_status.prediction_status.is_active and 
                    self.orchestrator_servicer.current_users > 0):
                    
-                   logger.info("Restarting prediction cycle automatically")
                    # Restart data collection for next cycle
                    self.start_data_collection(self.orchestrator_servicer.current_users)
                    
                    self.orchestrator_servicer.system_status.prediction_status.collecting_data = True
                    self.orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
                    
-                   logger.info("Orchestrator ready and collecting for next cycle")
                    
                    # Broadcast status update - collecting for next cycle (non-blocking)
                    try:

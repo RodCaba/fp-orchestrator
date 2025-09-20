@@ -127,6 +127,7 @@ class WebSocketManager:
         """
         Broadcast prediction status to all connected WebSocket clients.
         """
+        logger.info(f"Prediction status: {status}")
         message = {
             "type": "prediction_status",
             "data": {
