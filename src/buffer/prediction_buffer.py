@@ -57,7 +57,6 @@ class PredictionBuffer(Buffer):
    def _run_prediction_synchronously(self):
        """
        Run prediction synchronously and make orchestrator unavailable during prediction.
-       Similar to how Buffer handles S3 uploads.
        """
        try:
            # Make orchestrator unavailable during prediction
@@ -116,7 +115,7 @@ class PredictionBuffer(Buffer):
            logger.info(f"Raw prediction result: {result}")
            parsed_result = PredictionResult(
                predicted_label=result['predicted_class_names'][0],
-               confidence=result['probabilities'][0]['predictions'],
+               confidence=result['probabilities'][0][result['predictions'][0]],
                timestamp=datetime.now(),
                n_users=self.n_users
            )
