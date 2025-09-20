@@ -67,7 +67,31 @@
                 </div>
             </section>
 
-            <section class="activity-section">
+            <!-- Mode Selection Section -->
+            <section class="mode-section">
+                <h2><i class="fas fa-toggle-on"></i> Operation Mode</h2>
+                <div class="mode-switcher">
+                    <div class="mode-option">
+                        <input type="radio" id="recording-mode" name="mode" value="recording" checked>
+                        <label for="recording-mode">
+                            <i class="fas fa-record-vinyl"></i>
+                            <span>Recording Mode</span>
+                            <small>Collect labeled sensor data for training</small>
+                        </label>
+                    </div>
+                    <div class="mode-option">
+                        <input type="radio" id="prediction-mode" name="mode" value="prediction">
+                        <label for="prediction-mode">
+                            <i class="fas fa-brain"></i>
+                            <span>Prediction Mode</span>
+                            <small>Real-time activity classification</small>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recording Mode Section -->
+            <section class="activity-section" id="recording-section">
                 <h2><i class="fas fa-tags"></i> Activity Labeling</h2>
                 
                 <div class="activity-controls">
@@ -101,6 +125,60 @@
                             <button class="btn btn-success" id="add-activity-btn">
                                 <i class="fas fa-plus"></i> Add Activity
                             </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prediction Mode Section -->
+            <section class="prediction-section" id="prediction-section" style="display: none;">
+                <h2><i class="fas fa-brain"></i> Activity Prediction</h2>
+                
+                <div class="prediction-controls">
+                    <div class="prediction-status">
+                        <h3>Prediction Status</h3>
+                        <div class="status-display" id="prediction-status-display">
+                            <div class="prediction-state">
+                                <span class="state-indicator" id="prediction-state-indicator">
+                                    <i class="fas fa-circle"></i>
+                                </span>
+                                <span class="state-text" id="prediction-state-text">Ready to start</span>
+                            </div>
+                            <button class="btn btn-primary" id="start-prediction-btn">
+                                <i class="fas fa-play"></i> Start Prediction
+                            </button>
+                            <button class="btn btn-danger" id="stop-prediction-btn" style="display: none;">
+                                <i class="fas fa-stop"></i> Stop Prediction
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="prediction-progress" id="prediction-progress" style="display: none;">
+                        <h3>Data Collection Progress</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                            <span class="progress-text" id="progress-text">0%</span>
+                        </div>
+                        <p class="progress-info">Collecting sensor data for 5 seconds...</p>
+                    </div>
+
+                    <div class="prediction-results">
+                        <h3>Latest Prediction</h3>
+                        <div class="result-display" id="prediction-result-display">
+                            <div class="result-empty">
+                                <i class="fas fa-hourglass-half"></i>
+                                <span>Waiting for RFID detection...</span>
+                            </div>
+                            <div class="result-content" id="prediction-result-content" style="display: none;">
+                                <div class="predicted-activity">
+                                    <span class="activity-name" id="predicted-activity-name">--</span>
+                                    <span class="confidence-badge" id="confidence-badge">--</span>
+                                </div>
+                                <div class="prediction-details">
+                                    <p>Timestamp: <span id="prediction-timestamp">--</span></p>
+                                    <p>Users detected: <span id="prediction-users">--</span></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

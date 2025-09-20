@@ -8,7 +8,7 @@ from src import ActivityManager, GRPCServer, OrchestratorServicer
 from typing import List
 from datetime import datetime
 
-from src.models import Activity, StartActivityRequest
+from src.models import Activity, StartActivityRequest, PredictionRequest
 from src import OrchestratorServicer
 from contextlib import asynccontextmanager
 from src.websocket_manager import WebSocketManager
@@ -117,6 +117,58 @@ async def stop_activity():
     
     except ValueError as e:
         logger.error(f"Error stopping activity: {e}")
+        return Response(content=str(e), status_code=400)
+    
+@app.post("/api/start_prediction")
+async def start_prediction(request: PredictionRequest):
+    """
+    Start prediction mode
+    """
+    try:
+        if orchestrator_servicer.system_status.prediction_status.is_active:
+            raise ValueError("Prediction mode is already active.")
+        
+        # Update system status
+        orchestrator_servicer.system_status.orchestrator_ready = True
+        orchestrator_servicer.system_status.prediction_status.is_active = True
+        orchestrator_servicer.system_status.prediction_status.collecting_data = False
+        orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
+        orchestrator_servicer.system_status.prediction_status.current_prediction = None
+
+        orchestrator_servicer.start_prediction_data_collection()
+
+        # Broadcast status update
+        await websocket_manager.broadcast_orchestrator_status("prediction_active", "Prediction mode started")
+        logger.info("Prediction mode started")
+        return Response(content="Prediction mode started successfully", status_code=200)
+    
+    except ValueError as e:
+        logger.error(f"Error starting prediction mode: {e}")
+        return Response(content=str(e), status_code=400)
+    
+@app.post("/api/stop_prediction")
+async def stop_prediction():
+    """
+    Stop prediction mode
+    """
+    try:
+        if not orchestrator_servicer.system_status.prediction_status.is_active:
+            raise ValueError("Prediction mode is not active.")
+        
+        # Update system status
+        orchestrator_servicer.system_status.orchestrator_ready = False
+        orchestrator_servicer.system_status.prediction_status.is_active = False
+        orchestrator_servicer.system_status.prediction_status.collecting_data = False
+        orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
+        orchestrator_servicer.system_status.prediction_status.current_prediction = None
+
+        # Broadcast status update
+        await websocket_manager.broadcast_orchestrator_status("prediction_inactive", "Prediction mode stopped")
+        logger.info("Prediction mode stopped")
+        return Response(content="Prediction mode stopped successfully", status_code=200)
+    
+    except ValueError as e:
+        logger.error(f"Error stopping prediction mode: {e}")
         return Response(content=str(e), status_code=400)
     
 

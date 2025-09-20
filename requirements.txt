@@ -9,7 +9,7 @@ pydantic==2.11.7
 pytest==7.00
 
 # Utilities
-fp-orchestrator-utils==0.3.0
+fp-orchestrator-utils==0.4.1
 
 # gRPC
 grpcio==1.73.1
