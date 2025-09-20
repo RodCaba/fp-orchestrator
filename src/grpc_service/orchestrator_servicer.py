@@ -45,7 +45,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             "rfid": { "last_signal": None }
         }
         self.buffer = Buffer(size=10000, wsocket_manager=wsocket_manager)
-        self.prediction_buffer = PredictionBuffer(size=5000, wsocket_manager=wsocket_manager)
+        self.prediction_buffer = PredictionBuffer(wsocket_manager=wsocket_manager)
         self.prediction_buffer.set_orchestrator_servicer(self)  # Set reference for state management
         self.wsocket_manager = wsocket_manager   
         self.current_users = 0

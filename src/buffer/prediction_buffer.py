@@ -1,4 +1,3 @@
-from .buffer import Buffer
 from ..websocket_manager import WebSocketManager
 from fp_orchestrator_utils.src.har_inference import HARInference
 from datetime import datetime, timedelta
@@ -10,16 +9,18 @@ import threading
 
 logger = logging.getLogger(__name__)
 
-class PredictionBuffer(Buffer):
+class PredictionBuffer:
    """
-   Buffer to handle data gathered during prediction mode.
+   Standalone buffer to handle data gathered during prediction mode.
    """
-   def __init__(self, size, wsocket_manager: WebSocketManager):
-      super().__init__(size, wsocket_manager)
+   def __init__(self, wsocket_manager: WebSocketManager):
+      self.wsocket_manager = wsocket_manager
       # Data collection
+      self.data = []
       self.is_collecting = False
       self.inference_engine = HARInference()
       self.orchestrator_servicer = None  # Will be set by orchestrator
+      self.n_users = 0
       
    def set_orchestrator_servicer(self, orchestrator_servicer):
        """Set reference to orchestrator servicer for state management"""
@@ -29,30 +30,29 @@ class PredictionBuffer(Buffer):
         """
         Starts data collection for prediction.
         """
-        self._clear()
+        self.data.clear()
         self.is_collecting = True
         self.n_users = n_users
         logger.info("Started prediction data collection - waiting for audio data")
 
    def add(self, item: dict) -> bool:
        """
-       Overrides the add method to detect audio data and trigger prediction.
-       Similar to how Buffer uploads to S3 when threshold is reached.
+       Add sensor data and trigger prediction when audio data is received.
+       No locks needed since prediction runs synchronously.
        """
-       with self._lock:
-           if not self.is_collecting:
-               return False
+       if not self.is_collecting:
+           return False
 
-           # Add the item to the buffer
-           self.data.append(item)
-           
-           # Check if this is audio data - if so, trigger prediction immediately
-           if item.get('sensor_type') == 'audio':
-               logger.info("Audio data detected - triggering synchronous prediction")
-               self._run_prediction_synchronously()
-               return False  # Stop collecting after audio triggers prediction
-           
-           return True  # Continue collecting for other sensor types
+       # Add the item to the buffer
+       self.data.append(item)
+       
+       # Check if this is audio data - if so, trigger prediction immediately
+       if item.get('sensor_type') == 'audio':
+           logger.info("Audio data detected - triggering synchronous prediction")
+           self._run_prediction_synchronously()
+           return False  # Stop collecting after audio triggers prediction
+       
+       return True  # Continue collecting for other sensor types
 
    def _run_prediction_synchronously(self):
        """
@@ -86,7 +86,7 @@ class PredictionBuffer(Buffer):
        finally:
            # Reset buffer and restart the cycle automatically
            logger.info("Entering finally block - cleaning up prediction")
-           self._clear()
+           self.data.clear()
            self.is_collecting = False
            
            if self.orchestrator_servicer:
