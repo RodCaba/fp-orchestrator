@@ -128,6 +128,9 @@ class WebSocketManager:
         Broadcast prediction status to all connected WebSocket clients.
         """
         logger.info(f"Prediction status: {status}")
+        prediction_dict = status.current_prediction.dict() if status.current_prediction else None
+        if prediction_dict:
+            prediction_dict['timestamp'] = prediction_dict['timestamp'].isoformat()
         message = {
             "type": "prediction_status",
             "data": {
@@ -135,7 +138,7 @@ class WebSocketManager:
                 "waiting_for_rfid": status.waiting_for_rfid,
                 "collecting_data": status.collecting_data,
                 "data_collection_progress": status.data_collection_progress,
-                "current_prediction": status.current_prediction.dict() if status.current_prediction else None
+                "current_prediction": prediction_dict
             }
         }
         await self.broadcast(message)
