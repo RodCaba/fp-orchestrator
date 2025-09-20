@@ -116,7 +116,7 @@ class PredictionBuffer(Buffer):
            logger.info(f"Raw prediction result: {result}")
            parsed_result = PredictionResult(
                predicted_label=result['predicted_class_names'][0],
-               confidence=result['probabilities']['predictions'][0],
+               confidence=result['probabilities'][0]['predictions'],
                timestamp=datetime.now(),
                n_users=self.n_users
            )
