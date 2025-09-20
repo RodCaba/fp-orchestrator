@@ -1,10 +1,11 @@
-// dashboard.js
 class HARDashboard {
     constructor() {
         this.ws = null;
         this.activities = [];
         this.currentActivity = null;
         this.sessionStartTime = null;
+        this.currentMode = 'recording';
+        this.predictionActive = false;
         this.stats = {
             totalBatches: 0,
             s3Uploads: 0,
@@ -74,8 +75,18 @@ class HARDashboard {
                 break;
             case 's3_stats_update':
                 this.updateS3Stats(data.stats);
+                break;
             case 'orchestrator_status':
                 this.updateOrchestratorStatus(data.status, data.message);
+                break;
+            case 'prediction_status':
+                this.updatePredictionStatus(data.data);
+                break;
+            case 'prediction_result':
+                this.updatePredictionResult(data.data);
+                break;
+            case 'prediction_progress':
+                this.updatePredictionProgress(data.data.progress);
                 break;
             default:
                 console.log('Unknown message type:', data.type);
@@ -186,6 +197,55 @@ class HARDashboard {
         }
     }
 
+    // Prediction Mode Methods
+    async startPrediction() {
+        try {
+            const response = await fetch('/api/start_prediction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            });
+
+            if (response.ok) {
+                this.predictionActive = true;
+                this.updatePredictionControls();
+                this.updatePredictionState('waiting', 'Loading...');
+                this.showToast('Prediction mode started', 'success');
+            } else {
+                const error = await response.text();
+                this.showToast(`Error starting prediction: ${error}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error starting prediction:', error);
+            this.showToast('Error starting prediction', 'error');
+        }
+    }
+
+    async stopPrediction() {
+        try {
+            const response = await fetch('/api/stop_prediction', {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                this.predictionActive = false;
+                this.updatePredictionControls();
+                this.updatePredictionState('inactive', 'Ready to start');
+                this.hidePredictionProgress();
+                this.clearPredictionResult();
+                this.showToast('Prediction mode stopped', 'success');
+            } else {
+                const error = await response.text();
+                this.showToast(`Error stopping prediction: ${error}`, 'error');
+            }
+        } catch (error) {
+            console.error('Error stopping prediction:', error);
+            this.showToast('Error stopping prediction', 'error');
+        }
+    }
+
     // UI Updates
     populateActivitySelector() {
         const selector = document.getElementById('activity-selector');
@@ -263,8 +323,143 @@ class HARDashboard {
         document.getElementById('error-count').textContent = this.s3Stats.totalErrors;
     }
 
+    // Mode switching
+    switchMode(mode) {
+        this.currentMode = mode;
+        const recordingSection = document.getElementById('recording-section');
+        const predictionSection = document.getElementById('prediction-section');
+
+        if (mode === 'recording') {
+            recordingSection.style.display = 'block';
+            predictionSection.style.display = 'none';
+            
+            // Stop prediction if active
+            if (this.predictionActive) {
+                this.stopPrediction();
+            }
+        } else if (mode === 'prediction') {
+            recordingSection.style.display = 'none';
+            predictionSection.style.display = 'block';
+            
+            // Stop activity recording if active
+            if (this.currentActivity) {
+                this.stopActivity();
+            }
+        }
+    }
+
+    // Prediction UI Updates
+    updatePredictionControls() {
+        const startBtn = document.getElementById('start-prediction-btn');
+        const stopBtn = document.getElementById('stop-prediction-btn');
+
+        if (this.predictionActive) {
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'flex';
+        } else {
+            startBtn.style.display = 'flex';
+            stopBtn.style.display = 'none';
+        }
+    }
+
+    updatePredictionState(state, text) {
+        const indicator = document.getElementById('prediction-state-indicator');
+        const stateText = document.getElementById('prediction-state-text');
+
+        indicator.className = 'state-indicator';
+        indicator.classList.add(state);
+        stateText.textContent = text;
+    }
+
+    updatePredictionStatus(data) {
+        if (data.is_active) {
+            this.predictionActive = true;
+            this.updatePredictionControls();
+            
+            if (data.waiting_for_rfid) {
+                this.updatePredictionState('waiting', 'Loading...');
+                this.hidePredictionProgress();
+            } else if (data.collecting_data) {
+                this.updatePredictionState('collecting', 'Collecting sensor data...');
+                this.showPredictionProgress();
+                this.updatePredictionProgress(data.data_collection_progress);
+            }
+            
+            if (data.current_prediction) {
+                this.updatePredictionResult(data.current_prediction);
+            }
+        } else {
+            this.predictionActive = false;
+            this.updatePredictionControls();
+            this.updatePredictionState('inactive', 'Ready to start');
+            this.hidePredictionProgress();
+        }
+    }
+
+    updatePredictionProgress(progress) {
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        
+        const percentage = Math.round(progress * 100);
+        progressFill.style.width = `${percentage}%`;
+        progressText.textContent = `${percentage}%`;
+    }
+
+    showPredictionProgress() {
+        document.getElementById('prediction-progress').style.display = 'block';
+    }
+
+    hidePredictionProgress() {
+        document.getElementById('prediction-progress').style.display = 'none';
+    }
+
+    updatePredictionResult(result) {
+        const resultEmpty = document.querySelector('.result-empty');
+        const resultContent = document.getElementById('prediction-result-content');
+        
+        resultEmpty.style.display = 'none';
+        resultContent.style.display = 'block';
+        
+        // Update result content
+        document.getElementById('predicted-activity-name').textContent = result.predicted_label;
+        document.getElementById('prediction-timestamp').textContent = new Date(result.timestamp).toLocaleString();
+        document.getElementById('prediction-users').textContent = result.n_users;
+        
+        // Update confidence badge
+        const confidenceBadge = document.getElementById('confidence-badge');
+        const confidence = Math.round(result.confidence * 100);
+        confidenceBadge.textContent = `${confidence}%`;
+        
+        // Set confidence color
+        confidenceBadge.className = 'confidence-badge';
+        if (confidence >= 80) {
+            confidenceBadge.classList.add('high');
+        } else if (confidence >= 60) {
+            confidenceBadge.classList.add('medium');
+        } else {
+            confidenceBadge.classList.add('low');
+        }
+        
+        this.updatePredictionState('active', 'Prediction complete');
+    }
+
+    clearPredictionResult() {
+        const resultEmpty = document.querySelector('.result-empty');
+        const resultContent = document.getElementById('prediction-result-content');
+        
+        resultEmpty.style.display = 'block';
+        resultContent.style.display = 'none';
+    }
+
     // Event Listeners
     setupEventListeners() {
+        // Mode switcher
+        document.querySelectorAll('input[name="mode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.switchMode(e.target.value);
+            });
+        });
+
         // Activity selector
         document.getElementById('activity-selector').addEventListener('change', (e) => {
             const startBtn = document.getElementById('start-activity-btn');
@@ -297,6 +492,15 @@ class HARDashboard {
                 const name = e.target.value;
                 this.addActivity(name);
             }
+        });
+
+        // Prediction mode buttons
+        document.getElementById('start-prediction-btn').addEventListener('click', () => {
+            this.startPrediction();
+        });
+
+        document.getElementById('stop-prediction-btn').addEventListener('click', () => {
+            this.stopPrediction();
         });
     }
 

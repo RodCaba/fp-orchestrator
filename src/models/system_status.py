@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from datetime import datetime
 from .activity import Activity
+from .prediction import PredictionStatus
 
 class SystemStatus(BaseModel):
     """
@@ -9,6 +10,7 @@ class SystemStatus(BaseModel):
     """
     orchestrator_ready: bool = False
     current_activity: Optional[Activity] = None
+    prediction_status: PredictionStatus = PredictionStatus()
     sensors_connected: Dict[str, bool] = {
         "rfid": False,
         "imu": False,

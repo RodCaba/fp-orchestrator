@@ -408,29 +408,259 @@ section h2 i {
     }
 }
 
-/* Responsive Design */
+/* Mode Selection Styles */
+.mode-switcher {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.mode-option {
+    position: relative;
+}
+
+.mode-option input[type="radio"] {
+    display: none;
+}
+
+.mode-option label {
+    display: block;
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.mode-option label:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.mode-option input[type="radio"]:checked + label {
+    background: rgba(37, 99, 235, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.mode-option label i {
+    font-size: 32px;
+    margin-bottom: 10px;
+    display: block;
+    color: var(--gray-500);
+}
+
+.mode-option input[type="radio"]:checked + label i {
+    color: var(--primary-color);
+}
+
+.mode-option label span {
+    font-size: 18px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.mode-option label small {
+    color: var(--gray-600);
+    font-size: 14px;
+}
+
+/* Prediction Mode Styles */
+.prediction-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.prediction-status,
+.prediction-progress,
+.prediction-results {
+    background: var(--gray-50);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid var(--gray-200);
+}
+
+.prediction-status h3,
+.prediction-progress h3,
+.prediction-results h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 15px;
+}
+
+.status-display {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.prediction-state {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid var(--gray-200);
+}
+
+.state-indicator {
+    color: var(--gray-400);
+}
+
+.state-indicator.waiting {
+    color: var(--warning-color);
+    animation: pulse 2s infinite;
+}
+
+.state-indicator.collecting {
+    color: var(--info-color);
+    animation: pulse 1s infinite;
+}
+
+.state-indicator.predicting {
+    color: var(--primary-color);
+    animation: spin 1s linear infinite;
+}
+
+.state-indicator.active {
+    color: var(--success-color);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.state-text {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+/* Progress Bar */
+.progress-bar {
+    position: relative;
+    background: var(--gray-200);
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--gray-800);
+    z-index: 1;
+}
+
+.progress-info {
+    color: var(--gray-600);
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Prediction Results */
+.result-display {
+    background: white;
+    border-radius: 8px;
+    border: 2px solid var(--gray-200);
+    padding: 20px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.result-empty {
+    text-align: center;
+    color: var(--gray-500);
+}
+
+.result-empty i {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: block;
+    color: var(--gray-400);
+}
+
+.result-content {
+    width: 100%;
+}
+
+.predicted-activity {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.activity-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.confidence-badge {
+    background: var(--success-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.confidence-badge.medium {
+    background: var(--warning-color);
+}
+
+.confidence-badge.low {
+    background: var(--danger-color);
+}
+
+.prediction-details p {
+    color: var(--gray-600);
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.prediction-details span {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+/* Responsive Design Updates */
 @media (max-width: 768px) {
-    .container {
-        padding: 10px;
-    }
-    
-    header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    .activity-controls {
+    .prediction-controls {
         grid-template-columns: 1fr;
     }
     
-    .selection-controls,
-    .add-controls {
-        flex-direction: column;
+    .mode-switcher {
+        grid-template-columns: 1fr;
     }
     
-    .activity-display {
+    .predicted-activity {
         flex-direction: column;
-        align-items: stretch;
+        gap: 10px;
+        text-align: center;
     }
 }
