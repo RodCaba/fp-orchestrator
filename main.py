@@ -131,14 +131,17 @@ async def start_prediction(request: PredictionRequest):
         # Update system status
         orchestrator_servicer.system_status.orchestrator_ready = True
         orchestrator_servicer.system_status.prediction_status.is_active = True
+        orchestrator_servicer.system_status.prediction_status.waiting_for_rfid = True
         orchestrator_servicer.system_status.prediction_status.collecting_data = False
         orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
         orchestrator_servicer.system_status.prediction_status.current_prediction = None
 
-        orchestrator_servicer.start_prediction_data_collection()
-
-        # Broadcast status update
-        await websocket_manager.broadcast_orchestrator_status("prediction_active", "Prediction mode started")
+        # Only start data collection if users are present
+        if orchestrator_servicer.current_users > 0:
+            orchestrator_servicer.start_prediction_data_collection()
+            await websocket_manager.broadcast_orchestrator_status("prediction_active", "Prediction mode started - collecting data")
+        else:
+            await websocket_manager.broadcast_orchestrator_status("prediction_active", "Prediction mode started - waiting for RFID detection")
         logger.info("Prediction mode started")
         return Response(content="Prediction mode started successfully", status_code=200)
     
@@ -158,6 +161,7 @@ async def stop_prediction():
         # Update system status
         orchestrator_servicer.system_status.orchestrator_ready = False
         orchestrator_servicer.system_status.prediction_status.is_active = False
+        orchestrator_servicer.system_status.prediction_status.waiting_for_rfid = True
         orchestrator_servicer.system_status.prediction_status.collecting_data = False
         orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
         orchestrator_servicer.system_status.prediction_status.current_prediction = None

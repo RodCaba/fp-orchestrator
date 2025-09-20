@@ -45,7 +45,8 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             "rfid": { "last_signal": None }
         }
         self.buffer = Buffer(size=10000, wsocket_manager=wsocket_manager)
-        self.prediction_buffer = PredictionBuffer(size=5000, wsocket_manager=wsocket_manager, data_window_seconds=5)
+        self.prediction_buffer = PredictionBuffer(size=5000, wsocket_manager=wsocket_manager)
+        self.prediction_buffer.set_orchestrator_servicer(self)  # Set reference for state management
         self.wsocket_manager = wsocket_manager   
         self.current_users = 0
 
@@ -128,6 +129,13 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             self.system_status.total_batches_processed += 1
             self.current_users = request.current_tags or 0
 
+            # In prediction mode, start data collection when RFID is detected
+            if (self.system_status.prediction_status.is_active and 
+                self.system_status.prediction_status.waiting_for_rfid and 
+                self.current_users > 0):
+                logger.info(f"RFID detected {self.current_users} users - starting prediction data collection")
+                self.start_prediction_data_collection()
+
             # Broadcast RFID data via WebSocket
             self._handle_rfid_websocket_updates()
 
@@ -201,19 +209,11 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
     def _handle_prediction_buffer_upload(self, data: dict):
         """
         Handles data upload to the prediction buffer.
+        Simple pass-through - buffer handles its own logic.
         """
         try:
-            # Add data
-            still_collecting = self.prediction_buffer.add(data)
-
-            if not still_collecting:
-                self.system_status.prediction_status.collecting_data = False
-                self.prediction_buffer.predict_async()
-            else:
-                # Update progress
-                progress = self.prediction_buffer.get_collection_progress()
-                self.system_status.prediction_status.data_collection_progress = progress
-                self._handle_prediction_progress_ws_updates()
+            # Just add data - buffer will handle audio detection and prediction triggering
+            self.prediction_buffer.add(data)
         except Exception as e:
             logger.error(f"Error handling prediction buffer upload: {e}")
 
@@ -224,12 +224,15 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         try:
             self.system_status.prediction_status.is_active = True
             self.system_status.prediction_status.collecting_data = True
+            self.system_status.prediction_status.waiting_for_rfid = False
             self.system_status.prediction_status.data_collection_progress = 0.0
 
-            # Start data collection in predictor 
+            # Start data collection in prediction buffer
             self.prediction_buffer.start_data_collection(self.current_users)
             logger.info("Started prediction data collection")
-            self._handle_prediction_progress_ws_updates()
+            
+            # Broadcast status update
+            self._handle_prediction_status_ws_updates()
         except Exception as e:
             logger.error(f"Error starting prediction data collection: {e}")
 
@@ -422,9 +425,9 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
         thread = threading.Thread(target=run_async_updates, daemon=True)
         thread.start()
 
-    def _handle_prediction_progress_ws_updates(self):
+    def _handle_prediction_status_ws_updates(self):
         """
-        Broadcast prediction progress update
+        Broadcast prediction status update
         """
         def run_async_updates():
             loop = None
@@ -433,10 +436,10 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
                 asyncio.set_event_loop(loop)
 
                 loop.run_until_complete(
-                    self.wsocket_manager.broadcast_prediction_progress(self.system_status.prediction_status.data_collection_progress)
+                    self.wsocket_manager.broadcast_prediction_status(self.system_status.prediction_status)
                 )
             except Exception as e:
-                logger.error(f"Error broadcasting prediction progress: {e}")
+                logger.error(f"Error broadcasting prediction status: {e}")
 
             finally:
                 if loop:
