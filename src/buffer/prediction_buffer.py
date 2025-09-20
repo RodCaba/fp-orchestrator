@@ -84,18 +84,34 @@ class PredictionBuffer(Buffer):
        except Exception as e:
            logger.error(f"Error during synchronous prediction: {e}")
        finally:
-           # Reset buffer and make orchestrator available again
+           # Reset buffer and restart the cycle automatically
            self._clear()
            self.is_collecting = False
            
            if self.orchestrator_servicer:
-               self.orchestrator_servicer.system_status.orchestrator_ready = True
-               self.orchestrator_servicer.system_status.prediction_status.collecting_data = True
-               self.orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
-               logger.info("Orchestrator set back to available - ready for next prediction cycle")
-               
-               # Broadcast status update - ready for next cycle
-               self._broadcast_prediction_status("waiting", "Waiting for RFID detection...")
+               # Only restart if prediction mode is still active and users are present
+               if (self.orchestrator_servicer.system_status.prediction_status.is_active and 
+                   self.orchestrator_servicer.current_users > 0):
+                   
+                   logger.info("Restarting prediction cycle automatically")
+                   # Restart data collection for next cycle
+                   self.start_data_collection(self.orchestrator_servicer.current_users)
+                   
+                   self.orchestrator_servicer.system_status.orchestrator_ready = True
+                   self.orchestrator_servicer.system_status.prediction_status.collecting_data = True
+                   self.orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
+                   
+                   # Broadcast status update - collecting for next cycle
+                   self._broadcast_prediction_status("collecting", "Collecting data for next prediction...")
+               else:
+                   # No users detected or prediction mode stopped
+                   self.orchestrator_servicer.system_status.orchestrator_ready = True
+                   self.orchestrator_servicer.system_status.prediction_status.collecting_data = False
+                   self.orchestrator_servicer.system_status.prediction_status.waiting_for_rfid = True
+                   self.orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
+                   
+                   # Broadcast status update - waiting for users
+                   self._broadcast_prediction_status("waiting", "Waiting for users to be detected...")
 
    def _predict_synchronous(self) -> Optional[PredictionResult]:
        """

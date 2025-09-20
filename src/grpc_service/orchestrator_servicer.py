@@ -127,14 +127,22 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
 
             # Update stats
             self.system_status.total_batches_processed += 1
+            previous_users = self.current_users
             self.current_users = request.current_tags or 0
 
-            # In prediction mode, start data collection when RFID is detected
-            if (self.system_status.prediction_status.is_active and 
-                self.system_status.prediction_status.waiting_for_rfid and 
-                self.current_users > 0):
-                logger.info(f"RFID detected {self.current_users} users - starting prediction data collection")
-                self.start_prediction_data_collection()
+            # In prediction mode, check if we need to start/restart collection based on user availability
+            if self.system_status.prediction_status.is_active:
+                if self.current_users > 0 and self.system_status.prediction_status.waiting_for_rfid:
+                    # Users detected and we're waiting - start data collection
+                    logger.info(f"RFID detected {self.current_users} users - starting prediction data collection")
+                    self.start_prediction_data_collection()
+                elif self.current_users == 0 and previous_users > 0:
+                    # Users left - stop current collection and wait
+                    logger.info("No users detected - stopping data collection")
+                    self.prediction_buffer.is_collecting = False
+                    self.system_status.prediction_status.collecting_data = False
+                    self.system_status.prediction_status.waiting_for_rfid = True
+                    self._handle_prediction_status_ws_updates()
 
             # Broadcast RFID data via WebSocket
             self._handle_rfid_websocket_updates()

@@ -128,20 +128,22 @@ async def start_prediction(request: PredictionRequest):
         if orchestrator_servicer.system_status.prediction_status.is_active:
             raise ValueError("Prediction mode is already active.")
         
+        # Check if users are available (RFID requirement)
+        if orchestrator_servicer.current_users == 0:
+            raise ValueError("No users detected. At least 1 user must be present to start prediction mode.")
+        
         # Update system status
         orchestrator_servicer.system_status.orchestrator_ready = True
         orchestrator_servicer.system_status.prediction_status.is_active = True
-        orchestrator_servicer.system_status.prediction_status.waiting_for_rfid = True
+        orchestrator_servicer.system_status.prediction_status.waiting_for_rfid = False
         orchestrator_servicer.system_status.prediction_status.collecting_data = False
         orchestrator_servicer.system_status.prediction_status.data_collection_progress = 0.0
         orchestrator_servicer.system_status.prediction_status.current_prediction = None
 
-        # Only start data collection if users are present
-        if orchestrator_servicer.current_users > 0:
-            orchestrator_servicer.start_prediction_data_collection()
-            await websocket_manager.broadcast_orchestrator_status("prediction_active", "Prediction mode started - collecting data")
-        else:
-            await websocket_manager.broadcast_orchestrator_status("prediction_active", "Prediction mode started - waiting for RFID detection")
+        # Start data collection immediately since button was pressed and users are present
+        orchestrator_servicer.start_prediction_data_collection()
+        await websocket_manager.broadcast_orchestrator_status("prediction_active", "Prediction mode started - collecting data")
+        
         logger.info("Prediction mode started")
         return Response(content="Prediction mode started successfully", status_code=200)
     
