@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 import logging
 import uvicorn
 from src import ActivityManager, GRPCServer, OrchestratorServicer
+from src.metrics import SimpleMetricsManager
 from typing import List
 from datetime import datetime
 
@@ -21,14 +22,16 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    metrics_manager.start_monitoring()
     grpc_server.start()
-    logger.info("gRPC server started")
+    logger.info("gRPC server and metrics monitoring started")
     
     yield
     
     # Shutdown
+    metrics_manager.stop_monitoring()
     grpc_server.stop()
-    logger.info("gRPC server stopped")
+    logger.info("gRPC server and metrics monitoring stopped")
 
 # Initialize FastAPI app
 app = FastAPI(title="HAR Orchestrator", lifespan=lifespan)
@@ -39,8 +42,9 @@ templates = Jinja2Templates(directory="src/templates")
 
 activity_manager = ActivityManager()
 websocket_manager = WebSocketManager()
+metrics_manager = SimpleMetricsManager()
 
-orchestrator_servicer = OrchestratorServicer(websocket_manager)
+orchestrator_servicer = OrchestratorServicer(websocket_manager, metrics_manager)
 grpc_server = GRPCServer(orchestrator_servicer=orchestrator_servicer)
 
 
