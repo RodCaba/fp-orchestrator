@@ -2,6 +2,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 import logging
 from typing import List, Dict, Any
 import json
+from ..models.prediction import PredictionResult
 
 logger = logging.getLogger(__name__)
 
@@ -108,3 +109,53 @@ class WebSocketManager:
         }
         await self.broadcast(message)
         logger.info(f"Broadcasted S3 stats update: {s3_stats}")
+    
+    async def broadcast_prediction_progress(self, progress: float):
+        """
+        Broadcast prediction progress to all connected WebSocket clients.
+        """
+        message = {
+            "type": "prediction_progress",
+            "data": {
+                "progress": progress
+            }
+        }
+        await self.broadcast(message)
+        logger.info(f"Broadcasted prediction progress: {progress*100:.2f}%")
+
+    async def broadcast_prediction_status(self, status):
+        """
+        Broadcast prediction status to all connected WebSocket clients.
+        """
+        logger.info(f"Prediction status: {status}")
+        prediction_dict = status.current_prediction.dict() if status.current_prediction else None
+        if prediction_dict:
+            prediction_dict['timestamp'] = prediction_dict['timestamp'].isoformat()
+        message = {
+            "type": "prediction_status",
+            "data": {
+                "is_active": status.is_active,
+                "waiting_for_rfid": status.waiting_for_rfid,
+                "collecting_data": status.collecting_data,
+                "data_collection_progress": status.data_collection_progress,
+                "current_prediction": prediction_dict
+            }
+        }
+        await self.broadcast(message)
+        logger.info(f"Broadcasted prediction status: active={status.is_active}")
+
+    async def broadcast_prediction_result(self, result: PredictionResult):
+        """
+        Broadcast a prediction result to all connected WebSocket clients.
+        """
+        message = {
+            "type": "prediction_result",
+            "data": {
+                "predicted_label": result.predicted_label,
+                "confidence": result.confidence,
+                "timestamp": result.timestamp.isoformat(),
+                "n_users": result.n_users
+            }
+        }
+        await self.broadcast(message)
+        logger.info(f"Broadcasted prediction result: {result.predicted_label} with confidence {result.confidence}")

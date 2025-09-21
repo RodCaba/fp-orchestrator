@@ -10,3 +10,9 @@ __pycache__/
 # Orchestrator utils package directory
 fp-orchestrator-utils/
 fp_orchestrator_utils/
+
+# Github files
+.github/
+
+# HAR model files
+har_model.onnx
