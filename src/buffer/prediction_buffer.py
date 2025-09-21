@@ -177,8 +177,8 @@ class PredictionBuffer:
                    confidence=parsed_result.confidence
                )
                if metrics:
-                   logger.info(f"Inference completed - Total time: {metrics.total_time_ms:.2f}ms, "
-                             f"Memory: {metrics.memory_usage_mb:.2f}MB")
+                   logger.info(f"Inference completed - Total time: {metrics['total_time_ms']:.2f}ms, "
+                             f"Memory: {metrics['memory_usage_mb']:.2f}MB")
            
            logger.info(f"Prediction result: {parsed_result}")
            return parsed_result
