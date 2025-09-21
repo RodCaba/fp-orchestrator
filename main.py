@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 import logging
 import uvicorn
 from src import ActivityManager, GRPCServer, OrchestratorServicer
+from src.metrics import MetricsManager
 from typing import List
 from datetime import datetime
 
@@ -21,14 +22,16 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    metrics_manager.start_monitoring()
     grpc_server.start()
-    logger.info("gRPC server started")
+    logger.info("gRPC server and metrics monitoring started")
     
     yield
     
     # Shutdown
+    metrics_manager.stop_monitoring()
     grpc_server.stop()
-    logger.info("gRPC server stopped")
+    logger.info("gRPC server and metrics monitoring stopped")
 
 # Initialize FastAPI app
 app = FastAPI(title="HAR Orchestrator", lifespan=lifespan)
@@ -39,8 +42,9 @@ templates = Jinja2Templates(directory="src/templates")
 
 activity_manager = ActivityManager()
 websocket_manager = WebSocketManager()
+metrics_manager = MetricsManager()
 
-orchestrator_servicer = OrchestratorServicer(websocket_manager)
+orchestrator_servicer = OrchestratorServicer(websocket_manager, metrics_manager)
 grpc_server = GRPCServer(orchestrator_servicer=orchestrator_servicer)
 
 
@@ -176,6 +180,101 @@ async def stop_prediction():
     except ValueError as e:
         logger.error(f"Error stopping prediction mode: {e}")
         return Response(content=str(e), status_code=400)
+
+
+# Metrics API endpoints
+@app.get("/api/metrics/summary")
+async def get_metrics_summary():
+    """
+    Get a summary of performance metrics.
+    """
+    return metrics_manager.get_performance_summary()
+
+@app.get("/api/metrics/latest")
+async def get_latest_metrics():
+    """
+    Get the latest metrics for dashboard display.
+    """
+    return metrics_manager.get_latest_metrics()
+
+@app.get("/api/metrics/statistics")
+async def get_metrics_statistics():
+    """
+    Get detailed statistics about collected metrics.
+    """
+    return metrics_manager.get_metrics_statistics()
+
+@app.get("/api/metrics/inference/recent")
+async def get_recent_inference_metrics(count: int = 10):
+    """
+    Get recent inference metrics.
+    """
+    if count > 100:
+        count = 100  # Limit to prevent excessive data transfer
+    return {
+        "metrics": metrics_manager.performance_collector.get_recent_inference_metrics(count),
+        "count": count
+    }
+
+@app.get("/api/metrics/system/recent")
+async def get_recent_system_metrics(count: int = 60):
+    """
+    Get recent system metrics.
+    """
+    if count > 300:
+        count = 300  # Limit to prevent excessive data transfer
+    return {
+        "metrics": metrics_manager.performance_collector.get_recent_system_metrics(count),
+        "count": count
+    }
+
+@app.post("/api/metrics/export/json")
+async def export_metrics_json():
+    """
+    Export all metrics to JSON file.
+    """
+    try:
+        filepath = metrics_manager.export_metrics_to_json()
+        return {"status": "success", "filepath": filepath, "message": "Metrics exported to JSON"}
+    except Exception as e:
+        logger.error(f"Error exporting metrics to JSON: {e}")
+        return Response(content=f"Error exporting metrics: {str(e)}", status_code=500)
+
+@app.post("/api/metrics/export/csv/inference")
+async def export_inference_metrics_csv():
+    """
+    Export inference metrics to CSV file.
+    """
+    try:
+        filepath = metrics_manager.export_inference_metrics_to_csv()
+        return {"status": "success", "filepath": filepath, "message": "Inference metrics exported to CSV"}
+    except Exception as e:
+        logger.error(f"Error exporting inference metrics to CSV: {e}")
+        return Response(content=f"Error exporting metrics: {str(e)}", status_code=500)
+
+@app.post("/api/metrics/export/csv/system")
+async def export_system_metrics_csv():
+    """
+    Export system metrics to CSV file.
+    """
+    try:
+        filepath = metrics_manager.export_system_metrics_to_csv()
+        return {"status": "success", "filepath": filepath, "message": "System metrics exported to CSV"}
+    except Exception as e:
+        logger.error(f"Error exporting system metrics to CSV: {e}")
+        return Response(content=f"Error exporting metrics: {str(e)}", status_code=500)
+
+@app.delete("/api/metrics/clear")
+async def clear_metrics():
+    """
+    Clear all collected metrics.
+    """
+    try:
+        metrics_manager.clear_all_metrics()
+        return {"status": "success", "message": "All metrics cleared"}
+    except Exception as e:
+        logger.error(f"Error clearing metrics: {e}")
+        return Response(content=f"Error clearing metrics: {str(e)}", status_code=500)
     
 
 # WebSocket endpoint for real-time communication

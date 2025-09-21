@@ -3,6 +3,7 @@ from fp_orchestrator_utils.src.har_inference import HARInference
 from datetime import datetime, timedelta
 from typing import Optional
 from ..models.prediction import PredictionResult
+from ..metrics import MetricsManager
 import logging
 import asyncio
 import threading
@@ -13,8 +14,9 @@ class PredictionBuffer:
    """
    Standalone buffer to handle data gathered during prediction mode.
    """
-   def __init__(self, wsocket_manager: WebSocketManager):
+   def __init__(self, wsocket_manager: WebSocketManager, metrics_manager: Optional[MetricsManager] = None):
       self.wsocket_manager = wsocket_manager
+      self.metrics_manager = metrics_manager
       # Data collection
       self.data = []
       self.is_collecting = False
@@ -129,26 +131,55 @@ class PredictionBuffer:
 
    def _predict_synchronous(self) -> Optional[PredictionResult]:
        """
-       Perform prediction synchronously
+       Perform prediction synchronously with metrics collection
        """
        try: 
            if not self.data:
                logger.warning("Buffer is empty. Cannot perform prediction.")
                return None
            
+           # Start metrics measurement
+           if self.metrics_manager:
+               self.metrics_manager.start_inference_measurement(
+                   n_users=self.n_users,
+                   data_points_count=len(self.data)
+               )
+               self.metrics_manager.mark_preprocessing_start()
+           
            # Perform prediction
            data_obj = { 
                'n_users': self.n_users,
                'data': self.data
            }
+           
+           # Mark model execution start
+           if self.metrics_manager:
+               self.metrics_manager.mark_model_execution_start()
+           
            result = self.inference_engine.predict(data_obj)
            logger.info(f"Raw prediction result: {result}")
+           
+           # Mark postprocessing start
+           if self.metrics_manager:
+               self.metrics_manager.mark_postprocessing_start()
+           
            parsed_result = PredictionResult(
                predicted_label=result['predicted_class_names'][0],
                confidence=result['probabilities'][0][result['predictions'][0]],
                timestamp=datetime.now(),
                n_users=self.n_users
            )
+           
+           # Finish metrics measurement
+           if self.metrics_manager:
+               metrics = self.metrics_manager.finish_inference_measurement(
+                   predicted_label=parsed_result.predicted_label,
+                   confidence=parsed_result.confidence
+               )
+               if metrics:
+                   logger.info(f"Inference completed - Total time: {metrics.total_time_ms:.2f}ms, "
+                             f"Memory: {metrics.memory_usage_mb:.2f}MB")
+           
            logger.info(f"Prediction result: {parsed_result}")
            return parsed_result
        except Exception as e:

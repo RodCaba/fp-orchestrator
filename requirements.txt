@@ -18,3 +18,6 @@ protobuf==6.31.1
 
 # Data processing
 numpy==2.2.6
+
+# Performance monitoring
+psutil==6.1.1

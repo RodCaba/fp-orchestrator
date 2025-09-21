@@ -7,12 +7,14 @@ import grpc
 from ..models import create_sensor_data
 from ..websocket_manager import WebSocketManager
 from ..buffer import Buffer, PredictionBuffer
+from ..metrics import MetricsManager
 from datetime import datetime
 import time
 import threading
 import numpy as np
 import struct
 import base64
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +39,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
     """
     gRPC service for orchestrator operations.
     """
-    def __init__(self, wsocket_manager: WebSocketManager):
+    def __init__(self, wsocket_manager: WebSocketManager, metrics_manager: Optional[MetricsManager] = None):
         self.system_status = SystemStatus()
         self.sensor_stats = {
             "imu": { "batches_received": 0 },
@@ -45,9 +47,10 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
             "rfid": { "last_signal": None }
         }
         self.buffer = Buffer(size=10000, wsocket_manager=wsocket_manager)
-        self.prediction_buffer = PredictionBuffer(wsocket_manager=wsocket_manager)
+        self.prediction_buffer = PredictionBuffer(wsocket_manager=wsocket_manager, metrics_manager=metrics_manager)
         self.prediction_buffer.set_orchestrator_servicer(self)  # Set reference for state management
         self.wsocket_manager = wsocket_manager   
+        self.metrics_manager = metrics_manager
         self.current_users = 0
 
     def HealthCheck(self, request, context):
