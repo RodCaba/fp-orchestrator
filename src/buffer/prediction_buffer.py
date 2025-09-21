@@ -3,7 +3,7 @@ from fp_orchestrator_utils.src.har_inference import HARInference
 from datetime import datetime, timedelta
 from typing import Optional
 from ..models.prediction import PredictionResult
-from ..metrics import MetricsManager
+from ..metrics import SimpleMetricsManager
 import logging
 import asyncio
 import threading
@@ -14,7 +14,7 @@ class PredictionBuffer:
    """
    Standalone buffer to handle data gathered during prediction mode.
    """
-   def __init__(self, wsocket_manager: WebSocketManager, metrics_manager: Optional[MetricsManager] = None):
+   def __init__(self, wsocket_manager: WebSocketManager, metrics_manager: Optional[SimpleMetricsManager] = None):
       self.wsocket_manager = wsocket_manager
       self.metrics_manager = metrics_manager
       # Data collection

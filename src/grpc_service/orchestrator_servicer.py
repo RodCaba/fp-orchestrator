@@ -7,7 +7,7 @@ import grpc
 from ..models import create_sensor_data
 from ..websocket_manager import WebSocketManager
 from ..buffer import Buffer, PredictionBuffer
-from ..metrics import MetricsManager
+from ..metrics import SimpleMetricsManager
 from datetime import datetime
 import time
 import threading
@@ -39,7 +39,7 @@ class OrchestratorServicer(orchestrator_service_pb2_grpc.OrchestratorServiceServ
     """
     gRPC service for orchestrator operations.
     """
-    def __init__(self, wsocket_manager: WebSocketManager, metrics_manager: Optional[MetricsManager] = None):
+    def __init__(self, wsocket_manager: WebSocketManager, metrics_manager: Optional[SimpleMetricsManager] = None):
         self.system_status = SystemStatus()
         self.sensor_stats = {
             "imu": { "batches_received": 0 },
