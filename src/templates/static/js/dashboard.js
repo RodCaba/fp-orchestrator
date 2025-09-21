@@ -80,9 +80,11 @@ class HARDashboard {
                 this.updateOrchestratorStatus(data.status, data.message);
                 break;
             case 'prediction_status':
+                console.log('Received prediction_status:', data.data);
                 this.updatePredictionStatus(data.data);
                 break;
             case 'prediction_result':
+                console.log('Received prediction_result:', data.data);
                 this.updatePredictionResult(data.data);
                 break;
             case 'prediction_progress':
@@ -385,6 +387,7 @@ class HARDashboard {
                 this.updatePredictionProgress(data.data_collection_progress);
             }
             
+            // Only update prediction result if there's new data, don't clear existing results
             if (data.current_prediction) {
                 this.updatePredictionResult(data.current_prediction);
             }
@@ -393,6 +396,8 @@ class HARDashboard {
             this.updatePredictionControls();
             this.updatePredictionState('inactive', 'Ready to start');
             this.hidePredictionProgress();
+            // Only clear prediction results when prediction mode is actually stopped
+            this.clearPredictionResult();
         }
     }
 
@@ -414,6 +419,7 @@ class HARDashboard {
     }
 
     updatePredictionResult(result) {
+        console.log('updatePredictionResult called with:', result);
         const resultEmpty = document.querySelector('.result-empty');
         const resultContent = document.getElementById('prediction-result-content');
         
@@ -421,6 +427,7 @@ class HARDashboard {
         resultContent.style.display = 'block';
         
         // Update result content
+        console.log('Setting predicted-activity-name to:', result.predicted_label);
         document.getElementById('predicted-activity-name').textContent = result.predicted_label;
         document.getElementById('prediction-timestamp').textContent = new Date(result.timestamp).toLocaleString();
         document.getElementById('prediction-users').textContent = result.n_users;

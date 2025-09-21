@@ -543,6 +543,11 @@ section h2 i {
 }
 
 /* Progress Bar */
+.progress-container {
+    position: relative;
+    margin-bottom: 10px;
+}
+
 .progress-bar {
     position: relative;
     background: var(--gray-200);
